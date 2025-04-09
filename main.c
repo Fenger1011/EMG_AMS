@@ -37,5 +37,6 @@ int main(void) {
 	while (1) {
 		USART0_SendString("100\n");
 		_delay_ms(1);
+
 	}
 }

@@ -1,24 +1,15 @@
 #define F_CPU 16000000UL
 
-#include <stdlib.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdint.h>
 
 #define BAUD 9600
-#define MYUBRR F_CPU/16/BAUD-1
-#define VREF 5000  // in millivolts (5.00V)
-
-void adc_init(void) {
-	ADMUX = (1 << REFS0);  // AVcc with external capacitor at AREF
-	ADCSRA = (1 << ADEN)  | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // ADC enable, prescaler 128
-}
-
-uint16_t adc_read(uint8_t channel) {
-	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);  // Select channel 0–7
-	ADCSRA |= (1 << ADSC);  // Start conversion
-	while (ADCSRA & (1 << ADSC));  // Wait
-	return ADC;
-}
+#define MYUBRR (F_CPU/16/BAUD - 1)
+#define VREF 5000         // in millivolts
+#define BUFFER_SIZE 480   // 50 ms at ~9600 Hz
 
 void USART0_Init(unsigned int ubrr) {
 	UBRR0H = (unsigned char)(ubrr >> 8);
@@ -36,25 +27,49 @@ void USART0_SendString(const char *str) {
 	while (*str) USART0_Transmit(*str++);
 }
 
+void adc_init(void) {
+	ADMUX = (1 << REFS0);  // AVcc reference
+	ADCSRA = (1 << ADEN)  |
+	(1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);  // Prescaler 128
+}
+
+uint16_t adc_read(uint8_t channel) {
+	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
+	ADCSRA |= (1 << ADSC);
+	while (ADCSRA & (1 << ADSC));
+	return ADC;
+}
+
 int main(void) {
 	USART0_Init(MYUBRR);
 	adc_init();
 
-	char buffer[20];
-
+	uint16_t adc_val;
+	uint32_t voltage_mv;
+	int32_t ac_sample;
+	uint32_t sum_squares;
+	uint16_t rms_mv;
+	char buffer[16];
+	
 	while (1) {
-		uint16_t adc_val = adc_read(0);  // Read from A0
-		uint32_t voltage_mv = ((uint32_t)adc_val * VREF) / 1023;  // in millivolts
-		
-		uint32_t ac_coupled = voltage_mv - 2500; // Remove 2.5V DC bias
-		int envelope = abs(ac_coupled);
+		sum_squares = 0;
 
-		// Format string: e.g., "Voltage: 2480 mV\r\n"
-		itoa(envelope, buffer, 10);
-		USART0_SendString("Voltage: ");
+		for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
+			adc_val = adc_read(0);  // Fast sampling at ~9.6 kHz
+			voltage_mv = ((uint32_t)adc_val * VREF) / 1023;
+			ac_sample = (int32_t)voltage_mv - 2500;
+			sum_squares += (uint32_t)(ac_sample * ac_sample);
+		}
+
+		rms_mv = (uint16_t)sqrt(sum_squares / BUFFER_SIZE);
+
+		itoa(rms_mv, buffer, 10);
 		USART0_SendString(buffer);
-		//USART0_SendString(" mV\r\n");
+		USART0_SendString("\r\n");
 
-		_delay_ms(50);
+		// Optional small pause between batches (not needed for sampling)
+		// _delay_ms(1);
+		
+		
 	}
 }

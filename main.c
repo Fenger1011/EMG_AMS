@@ -5,71 +5,99 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdint.h>
+#include <avr/interrupt.h>
+#include "USART_Driver.h"
 
 #define BAUD 9600
-#define MYUBRR (F_CPU/16/BAUD - 1)
-#define VREF 5000         // in millivolts
-#define BUFFER_SIZE 480   // 50 ms at ~9600 Hz
+#define MYUBRR (F_CPU/16/BAUD - 1) // Set baud rate for UART
 
-void USART0_Init(unsigned int ubrr) {
-	UBRR0H = (unsigned char)(ubrr >> 8);
-	UBRR0L = (unsigned char)ubrr;
-	UCSR0B = (1 << TXEN0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
-}
+#define VREF 5000								// ADC reference in millivolts
+#define BUFFER_SIZE 480							// 50 ms window at ~9600 Hz ADC sampling frequency
+volatile uint16_t emg_samples[BUFFER_SIZE];		// Buffer for holding EMG samples
+volatile uint16_t emg_index = 0;				// For knowing buffer index
+volatile uint8_t emg_buffer_full = 0;			// Flag for when sample buffer is full and calculations should be triggered
 
-void USART0_Transmit(unsigned char data) {
-	while (!(UCSR0A & (1 << UDRE0)));
-	UDR0 = data;
-}
 
-void USART0_SendString(const char *str) {
-	while (*str) USART0_Transmit(*str++);
-}
-
+/*******************************************************ADC*************************************************************/
+// Initializes ADC
 void adc_init(void) {
-	ADMUX = (1 << REFS0);  // AVcc reference
-	ADCSRA = (1 << ADEN)  |
-	(1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);  // Prescaler 128
+	ADMUX  = (1 << REFS0);									// AVcc as ref
+	ADCSRA = (1 << ADEN)  | (1 << ADIE)						// Enable ADC + interrupt
+		   | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// Prescaler 128
+	sei();													// Global interrupts on
+	ADCSRA |= (1 << ADSC);									// Kick off first conversion
 }
+/***********************************************************************************************************************/
 
-uint16_t adc_read(uint8_t channel) {
-	ADMUX = (ADMUX & 0xF0) | (channel & 0x0F);
-	ADCSRA |= (1 << ADSC);
-	while (ADCSRA & (1 << ADSC));
-	return ADC;
+/*******************************************************ISR*************************************************************/
+ISR(ADC_vect) {
+	emg_samples[emg_index++] = ADC;
+
+	if (emg_index >= BUFFER_SIZE) {
+		emg_index = 0;
+		emg_buffer_full = 1;  // set flag to signal main
+	}
+
+	ADCSRA |= (1 << ADSC); // start next conversion
 }
+/***********************************************************************************************************************/
+
+/*****************************************SIGNAL CONDITIONING***********************************************************/
+uint16_t calculate_RMS(void) {
+
+	uint32_t sum = 0;
+	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
+		sum += emg_samples[i];
+	}
+	uint16_t mean = sum / BUFFER_SIZE;
+
+	uint32_t sum_squares = 0;
+	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
+		int16_t centered_sample = (int16_t)emg_samples[i] - (int16_t)mean;
+		sum_squares += (uint32_t)centered_sample * (uint32_t)centered_sample;
+	}
+
+	uint32_t mean_square = sum_squares / BUFFER_SIZE;
+	uint16_t rms = (uint16_t)sqrt((double)mean_square);
+
+	return rms;  // 0..1023 ? ADC range RMS (centered)
+}
+/************************************************************************************************************************/
 
 int main(void) {
+
 	USART0_Init(MYUBRR);
 	adc_init();
 
-	uint16_t adc_val;
-	uint32_t voltage_mv;
-	int32_t ac_sample;
-	uint32_t sum_squares;
-	uint16_t rms_mv;
-	char buffer[16];
+	uint16_t rms_adc = 0;
+	uint32_t rms_mv = 0;
+	uint16_t threshold = 1000; //Threshold in mV for when to move motor
 	
-	while (1) {
-		sum_squares = 0;
+	// Set pin 13 (PB7) as output for debugging
+	DDRB |= (1 << PB7);
 
-		for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-			adc_val = adc_read(0);  // Fast sampling at ~9.6 kHz
-			voltage_mv = ((uint32_t)adc_val * VREF) / 1023;
-			ac_sample = (int32_t)voltage_mv - 2500;
-			sum_squares += (uint32_t)(ac_sample * ac_sample);
+	while (1) {
+
+		// Check if EMG buffer is full (ISR sets this flag)
+		if (emg_buffer_full) {
+			emg_buffer_full = 0;  // Clear flag
+
+			// Calculate RMS from EMG samples buffer
+			rms_adc = calculate_RMS();
+
+			// Convert ADC value to millivolts
+			rms_mv = (uint32_t)rms_adc * VREF / 1023;
+
+			// If 50ms window RMS value above 
+			if (rms_mv >= 1000){
+				PORTB |= (1 << PB7); // Turn ON LED
+			} else {
+				PORTB &= ~(1 << PB7); // Turn OFF LED
+			}
+			
 		}
 
-		rms_mv = (uint16_t)sqrt(sum_squares / BUFFER_SIZE);
-
-		itoa(rms_mv, buffer, 10);
-		USART0_SendString(buffer);
-		USART0_SendString("\r\n");
-
-		// Optional small pause between batches (not needed for sampling)
-		// _delay_ms(1);
-		
-		
+		// Other background tasks (optional)
 	}
 }
+

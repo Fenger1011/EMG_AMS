@@ -18,6 +18,23 @@ volatile uint16_t emg_index = 0;				// For knowing buffer index
 volatile uint8_t emg_buffer_full = 0;			// Flag for when sample buffer is full and calculations should be triggered
 
 
+void pwm_init(void) {
+	// Set PE3 (OC3A, Arduino Mega Pin 5) as output
+	DDRE |= (1 << PE3);
+	
+	// Fast PWM with ICR3 as TOP, Non-inverted PWM
+	TCCR3A = (1 << COM3A1) | (1 << WGM31);
+	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS31) | (1 << CS30); // Prescaler 64
+	
+	ICR3 = 4999; // TOP ? sets PWM frequency to 50 Hz
+}
+
+void pwm_set_duty(uint16_t duty_percent) {
+	OCR3A = (uint32_t)ICR3 * duty_percent / 100;
+}
+
+
+
 /*******************************************************ADC*************************************************************/
 // Initializes ADC
 void adc_init(void) {
@@ -68,14 +85,20 @@ int main(void) {
 
 	USART0_Init(MYUBRR);
 	adc_init();
+	pwm_init();
 
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
-	uint16_t threshold = 1000; //Threshold in mV for when to move motor
+	uint16_t threshold = 200; //Threshold in mV for when to move motor
+	uint16_t overThreshold = 0;
+	uint16_t underThreshold = 0;
+	char buffer[10];  // Enough for millivolt values (max "5000\0")
 	
 	// Set pin 13 (PB7) as output for debugging
 	DDRB |= (1 << PB7);
-
+	
+	
+	
 	while (1) {
 
 		// Check if EMG buffer is full (ISR sets this flag)
@@ -88,16 +111,39 @@ int main(void) {
 			// Convert ADC value to millivolts
 			rms_mv = (uint32_t)rms_adc * VREF / 1023;
 
-			// If 50ms window RMS value above 
-			if (rms_mv >= 1000){
-				PORTB |= (1 << PB7); // Turn ON LED
-			} else {
-				PORTB &= ~(1 << PB7); // Turn OFF LED
-			}
-			
-		}
+			// Convert rms_mv to string
+			itoa(rms_mv, buffer, 10);  // Convert to decimal string
 
-		// Other background tasks (optional)
+			USART0_SendString(buffer);
+			
+			// Send newline
+			USART0_Transmit('\n');
+			
+			// If 50ms window RMS value above threshold
+			if (rms_mv >= threshold) {
+				overThreshold++;
+				
+				if (overThreshold == 3) {
+					PORTB |= (1 << PB7); // Turn ON LED
+					pwm_set_duty(6);
+					_delay_ms(500);
+					pwm_set_duty(0);
+					underThreshold = 0;
+				}
+			}
+
+			// If 50ms window RMS value below threshold
+			if (rms_mv <= threshold) {
+				underThreshold++;
+				
+				if (underThreshold == 5) {
+					PORTB &= ~(1 << PB7); // Turn OFF LED
+					pwm_set_duty(9);
+					_delay_ms(475);
+					pwm_set_duty(0);
+					overThreshold = 0;
+				}
+			}
+		}
 	}
 }
-

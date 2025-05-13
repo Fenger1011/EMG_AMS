@@ -34,11 +34,13 @@ LINKER_SCRIPT_DEP:=
 # Every subdirectory with source files must be described here
 SUBDIRS :=  \
 ../Drivers/ \
+../Drivers/TFT_Driver/ \
 ../Drivers/USART_Driver/
 
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../Drivers/TFT_Driver/TFT_Driver.c \
 ../Drivers/USART_Driver/USART_Driver.c \
 ../main.c
 
@@ -50,18 +52,22 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+Drivers/TFT_Driver/TFT_Driver.o \
 Drivers/USART_Driver/USART_Driver.o \
 main.o
 
 OBJS_AS_ARGS +=  \
+Drivers/TFT_Driver/TFT_Driver.o \
 Drivers/USART_Driver/USART_Driver.o \
 main.o
 
 C_DEPS +=  \
+Drivers/TFT_Driver/TFT_Driver.d \
 Drivers/USART_Driver/USART_Driver.d \
 main.d
 
 C_DEPS_AS_ARGS +=  \
+Drivers/TFT_Driver/TFT_Driver.d \
 Drivers/USART_Driver/USART_Driver.d \
 main.d
 
@@ -79,17 +85,24 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+Drivers/TFT_Driver/TFT_Driver.o: ../Drivers/TFT_Driver/TFT_Driver.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
 Drivers/USART_Driver/USART_Driver.o: ../Drivers/USART_Driver/USART_Driver.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 
 ./main.o: .././main.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
-	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\include" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver" -I"C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver"  -Og -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
 	@echo Finished building: $<
 	
 

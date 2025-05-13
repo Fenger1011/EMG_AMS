@@ -101,6 +101,7 @@
     <ListValues>
       <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.7.374\include\</Value>
       <Value>C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver</Value>
+      <Value>C:\Users\Christian Fenger\Documents\Atmel Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize debugging experience (-Og)</avrgcc.compiler.optimization.level>
@@ -123,6 +124,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Drivers\TFT_Driver\TFT_Driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\TFT_Driver\TFT_Driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drivers\USART_Driver\USART_Driver.c">
       <SubType>compile</SubType>
     </Compile>
@@ -135,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Drivers\" />
+    <Folder Include="Drivers\TFT_Driver\" />
     <Folder Include="Drivers\USART_Driver\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

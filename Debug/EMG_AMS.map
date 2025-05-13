@@ -25,9 +25,11 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o)
                               main.o (__mulhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_umulhisi3.o)
-                              main.o (__umulhisi3)
+                              Drivers/TFT_Driver/TFT_Driver.o (__umulhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
                               c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o) (__usmulhisi3_tail)
+c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+                              main.o (__muluhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
                               main.o (__itoa_ncheck)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(utoa_ncheck.o)
@@ -44,6 +46,21 @@ Discarded input sections
 
  .data          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
  .bss           0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
+ .text          0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
+ .data          0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
+ .bss           0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
+ .text.DisplayOff
+                0x00000000        0x8 Drivers/TFT_Driver/TFT_Driver.o
+ .text.DisplayOn
+                0x00000000        0x8 Drivers/TFT_Driver/TFT_Driver.o
+ .text.SleepOut
+                0x00000000        0x2 Drivers/TFT_Driver/TFT_Driver.o
+ .text.MemoryAccessControl
+                0x00000000        0x2 Drivers/TFT_Driver/TFT_Driver.o
+ .text.InterfacePixelFormat
+                0x00000000        0x2 Drivers/TFT_Driver/TFT_Driver.o
+ .text.MemoryWrite
+                0x00000000        0x2 Drivers/TFT_Driver/TFT_Driver.o
  .text          0x00000000        0x0 Drivers/USART_Driver/USART_Driver.o
  .data          0x00000000        0x0 Drivers/USART_Driver/USART_Driver.o
  .bss           0x00000000        0x0 Drivers/USART_Driver/USART_Driver.o
@@ -162,6 +179,20 @@ Discarded input sections
                 0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
  .text.libgcc.fixed
                 0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
+ .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc.div
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc   0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
@@ -188,6 +219,7 @@ Linker script and memory map
 
 Address of section .data set to 0x800200
 LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
+LOAD Drivers/TFT_Driver/TFT_Driver.o
 LOAD Drivers/USART_Driver/USART_Driver.o
 LOAD main.o
 START GROUP
@@ -299,7 +331,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x686
+.text           0x00000000      0xb40
  *(.vectors)
  .vectors       0x00000000       0xe4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
                 0x00000000                __vector_default
@@ -414,89 +446,126 @@ END GROUP
                 0x00000108                __vector_42
                 0x0000010a                . = ALIGN (0x2)
  *(.text.*)
+ .text.pulseWR  0x0000010a        0xe Drivers/TFT_Driver/TFT_Driver.o
+                0x0000010a                pulseWR
+ .text.WriteCommand
+                0x00000118       0x14 Drivers/TFT_Driver/TFT_Driver.o
+                0x00000118                WriteCommand
+ .text.WriteData
+                0x0000012c       0x16 Drivers/TFT_Driver/TFT_Driver.o
+                0x0000012c                WriteData
+ .text.DisplayInit
+                0x00000142      0x232 Drivers/TFT_Driver/TFT_Driver.o
+                0x00000142                DisplayInit
+ .text.WritePixel
+                0x00000374       0x1e Drivers/TFT_Driver/TFT_Driver.o
+                0x00000374                WritePixel
+ .text.SetColumnAddress
+                0x00000392       0x32 Drivers/TFT_Driver/TFT_Driver.o
+                0x00000392                SetColumnAddress
+ .text.SetPageAddress
+                0x000003c4       0x32 Drivers/TFT_Driver/TFT_Driver.o
+                0x000003c4                SetPageAddress
+ .text.BackgroundColor
+                0x000003f6       0x72 Drivers/TFT_Driver/TFT_Driver.o
+                0x000003f6                BackgroundColor
+ .text.DrawVerticalLine
+                0x00000468       0x44 Drivers/TFT_Driver/TFT_Driver.o
+                0x00000468                DrawVerticalLine
+ .text.DrawHorizontalLine
+                0x000004ac       0x50 Drivers/TFT_Driver/TFT_Driver.o
+                0x000004ac                DrawHorizontalLine
+ .text.InitCoordinate
+                0x000004fc       0x36 Drivers/TFT_Driver/TFT_Driver.o
+                0x000004fc                InitCoordinate
+ .text.DrawEMG  0x00000532       0x3c Drivers/TFT_Driver/TFT_Driver.o
+                0x00000532                DrawEMG
  .text.USART0_Init
-                0x0000010a       0x16 Drivers/USART_Driver/USART_Driver.o
-                0x0000010a                USART0_Init
+                0x0000056e       0x16 Drivers/USART_Driver/USART_Driver.o
+                0x0000056e                USART0_Init
  .text.USART0_Transmit
-                0x00000120        0xe Drivers/USART_Driver/USART_Driver.o
-                0x00000120                USART0_Transmit
+                0x00000584        0xe Drivers/USART_Driver/USART_Driver.o
+                0x00000584                USART0_Transmit
  .text.USART0_SendString
-                0x0000012e       0x18 Drivers/USART_Driver/USART_Driver.o
-                0x0000012e                USART0_SendString
+                0x00000592       0x18 Drivers/USART_Driver/USART_Driver.o
+                0x00000592                USART0_SendString
  .text.pwm_init
-                0x00000146       0x20 main.o
-                0x00000146                pwm_init
+                0x000005aa       0x24 main.o
+                0x000005aa                pwm_init
  .text.pwm_set_duty
-                0x00000166       0x20 main.o
-                0x00000166                pwm_set_duty
+                0x000005ce       0x20 main.o
+                0x000005ce                pwm_set_duty
  .text.adc_init
-                0x00000186       0x18 main.o
-                0x00000186                adc_init
+                0x000005ee       0x18 main.o
+                0x000005ee                adc_init
  .text.__vector_29
-                0x0000019e       0x86 main.o
-                0x0000019e                __vector_29
+                0x00000606       0x86 main.o
+                0x00000606                __vector_29
  .text.calculate_RMS
-                0x00000224       0xb4 main.o
-                0x00000224                calculate_RMS
- .text.main     0x000002d8       0xf2 main.o
-                0x000002d8                main
+                0x0000068c       0xb4 main.o
+                0x0000068c                calculate_RMS
+ .text.main     0x00000740      0x130 main.o
+                0x00000740                main
  .text.avr-libc.fplib
-                0x000003ca       0x58 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fixunssfsi.o)
-                0x000003ca                __fixunssfsi
+                0x00000870       0x58 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fixunssfsi.o)
+                0x00000870                __fixunssfsi
  .text.avr-libc.fplib
-                0x00000422       0x7a c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(floatsisf.o)
-                0x00000422                __floatunsisf
-                0x00000426                __floatsisf
+                0x000008c8       0x7a c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(floatsisf.o)
+                0x000008c8                __floatunsisf
+                0x000008cc                __floatsisf
  .text.avr-libc.fplib
-                0x0000049c       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_split3.o)
-                0x0000049c                __fp_split3
-                0x000004ac                __fp_splitA
+                0x00000942       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_split3.o)
+                0x00000942                __fp_split3
+                0x00000952                __fp_splitA
  .text.avr-libc.fplib
-                0x000004e0        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_zero.o)
-                0x000004e0                __fp_zero
-                0x000004e2                __fp_szero
+                0x00000986        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_zero.o)
+                0x00000986                __fp_zero
+                0x00000988                __fp_szero
  .text.avr-libc.fplib
-                0x000004ee       0x84 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(sqrt.o)
-                0x000004f6                sqrtf
-                0x000004f6                sqrt
+                0x00000994       0x84 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(sqrt.o)
+                0x0000099c                sqrtf
+                0x0000099c                sqrt
  .text.avr-libc.fplib
-                0x00000572       0x1c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_mpack.o)
-                0x00000572                __fp_mpack
-                0x00000576                __fp_mpack_finite
+                0x00000a18       0x1c c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_mpack.o)
+                0x00000a18                __fp_mpack
+                0x00000a1c                __fp_mpack_finite
  .text.avr-libc.fplib
-                0x0000058e        0x6 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_nan.o)
-                0x0000058e                __fp_nan
+                0x00000a34        0x6 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_nan.o)
+                0x00000a34                __fp_nan
  .text.avr-libc.fplib
-                0x00000594        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_norm2.o)
-                0x00000594                __fp_norm2
+                0x00000a3a        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_norm2.o)
+                0x00000a3a                __fp_norm2
  .text.libgcc.div
-                0x000005a2       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_udivmodsi4.o)
-                0x000005a2                __udivmodsi4
+                0x00000a48       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_udivmodsi4.o)
+                0x00000a48                __udivmodsi4
  .text.libgcc.mul
-                0x000005e6        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o)
-                0x000005e6                __mulhisi3
+                0x00000a8c        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o)
+                0x00000a8c                __mulhisi3
  .text.libgcc.mul
-                0x000005f2       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_umulhisi3.o)
-                0x000005f2                __umulhisi3
+                0x00000a98       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_umulhisi3.o)
+                0x00000a98                __umulhisi3
  .text.libgcc.mul
-                0x00000610        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
-                0x00000610                __usmulhisi3
-                0x00000612                __usmulhisi3_tail
+                0x00000ab6        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
+                0x00000ab6                __usmulhisi3
+                0x00000ab8                __usmulhisi3_tail
+ .text.libgcc.mul
+                0x00000ac2       0x14 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
+                0x00000ac2                __muluhisi3
  .text.avr-libc
-                0x0000061c       0x14 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
-                0x0000061c                __itoa_ncheck
+                0x00000ad6       0x14 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
+                0x00000ad6                __itoa_ncheck
  .text.avr-libc
-                0x00000630       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(utoa_ncheck.o)
-                0x00000630                __utoa_ncheck
-                0x00000632                __utoa_common
+                0x00000aea       0x32 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(utoa_ncheck.o)
+                0x00000aea                __utoa_ncheck
+                0x00000aec                __utoa_common
  .text.avr-libc
-                0x00000662       0x20 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(strrev.o)
-                0x00000662                strrev
-                0x00000682                . = ALIGN (0x2)
+                0x00000b1c       0x20 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(strrev.o)
+                0x00000b1c                strrev
+                0x00000b3c                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000682        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
-                0x00000682                _exit
-                0x00000682                exit
+ .fini9         0x00000b3c        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
+                0x00000b3c                _exit
+                0x00000b3c                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -515,11 +584,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000682        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
+ .fini0         0x00000b3c        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000686                _etext = .
+                0x00000b40                _etext = .
 
-.data           0x00800200        0x0 load address 0x00000686
+.data           0x00800200        0x0 load address 0x00000b40
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -545,8 +614,8 @@ END GROUP
  COMMON         0x00800203      0x3c0 main.o
                 0x00800203                emg_samples
                 0x008005c3                PROVIDE (__bss_end, .)
-                0x00000686                __data_load_start = LOADADDR (.data)
-                0x00000686                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000b40                __data_load_start = LOADADDR (.data)
+                0x00000b40                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x008005c3        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -594,8 +663,9 @@ END GROUP
 
 .comment        0x00000000       0x30
  *(.comment)
- .comment       0x00000000       0x30 Drivers/USART_Driver/USART_Driver.o
+ .comment       0x00000000       0x30 Drivers/TFT_Driver/TFT_Driver.o
                                  0x31 (size before relaxing)
+ .comment       0x00000030       0x31 Drivers/USART_Driver/USART_Driver.o
  .comment       0x00000030       0x31 main.o
 
 .note.gnu.avr.deviceinfo
@@ -618,51 +688,60 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x78
+.debug_aranges  0x00000000      0x120
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x30 Drivers/USART_Driver/USART_Driver.o
+                0x00000000       0xa8 Drivers/TFT_Driver/TFT_Driver.o
  .debug_aranges
-                0x00000030       0x48 main.o
+                0x000000a8       0x30 Drivers/USART_Driver/USART_Driver.o
+ .debug_aranges
+                0x000000d8       0x48 main.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x11d7
+.debug_info     0x00000000     0x22f6
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0xbbc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_info    0x00000bbc      0x104 Drivers/USART_Driver/USART_Driver.o
- .debug_info    0x00000cc0      0x517 main.o
+ .debug_info    0x00000bbc     0x109e Drivers/TFT_Driver/TFT_Driver.o
+ .debug_info    0x00001c5a      0x104 Drivers/USART_Driver/USART_Driver.o
+ .debug_info    0x00001d5e      0x598 main.o
 
-.debug_abbrev   0x00000000      0xe56
+.debug_abbrev   0x00000000     0x1039
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0xb1a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_abbrev  0x00000b1a       0xb5 Drivers/USART_Driver/USART_Driver.o
- .debug_abbrev  0x00000bcf      0x287 main.o
+ .debug_abbrev  0x00000b1a      0x1d8 Drivers/TFT_Driver/TFT_Driver.o
+ .debug_abbrev  0x00000cf2       0xb5 Drivers/USART_Driver/USART_Driver.o
+ .debug_abbrev  0x00000da7      0x292 main.o
 
-.debug_line     0x00000000      0x68c
+.debug_line     0x00000000      0xd61
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1fa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_line    0x000001fa      0x11e Drivers/USART_Driver/USART_Driver.o
- .debug_line    0x00000318      0x374 main.o
+ .debug_line    0x000001fa      0x632 Drivers/TFT_Driver/TFT_Driver.o
+ .debug_line    0x0000082c      0x11e Drivers/USART_Driver/USART_Driver.o
+ .debug_line    0x0000094a      0x417 main.o
 
-.debug_frame    0x00000000      0x124
+.debug_frame    0x00000000      0x30c
  *(.debug_frame)
- .debug_frame   0x00000000       0x50 Drivers/USART_Driver/USART_Driver.o
- .debug_frame   0x00000050       0xd4 main.o
+ .debug_frame   0x00000000      0x1e8 Drivers/TFT_Driver/TFT_Driver.o
+ .debug_frame   0x000001e8       0x50 Drivers/USART_Driver/USART_Driver.o
+ .debug_frame   0x00000238       0xd4 main.o
 
-.debug_str      0x00000000      0x6ee
+.debug_str      0x00000000      0x858
  *(.debug_str)
  .debug_str     0x00000000      0x3e6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_str     0x000003e6      0x19c Drivers/USART_Driver/USART_Driver.o
+ .debug_str     0x000003e6      0x2f2 Drivers/TFT_Driver/TFT_Driver.o
+                                0x32d (size before relaxing)
+ .debug_str     0x000006d8       0x5a Drivers/USART_Driver/USART_Driver.o
                                 0x1d5 (size before relaxing)
- .debug_str     0x00000582      0x16c main.o
-                                0x31d (size before relaxing)
+ .debug_str     0x00000732      0x126 main.o
+                                0x34e (size before relaxing)
 
-.debug_loc      0x00000000      0x41f
+.debug_loc      0x00000000      0xcc0
  *(.debug_loc)
- .debug_loc     0x00000000       0x7d Drivers/USART_Driver/USART_Driver.o
- .debug_loc     0x0000007d      0x3a2 main.o
+ .debug_loc     0x00000000      0x85d Drivers/TFT_Driver/TFT_Driver.o
+ .debug_loc     0x0000085d       0x7d Drivers/USART_Driver/USART_Driver.o
+ .debug_loc     0x000008da      0x3e6 main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -682,10 +761,11 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x88
+.debug_ranges   0x00000000      0x120
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x20 Drivers/USART_Driver/USART_Driver.o
- .debug_ranges  0x00000020       0x68 main.o
+ .debug_ranges  0x00000000       0x98 Drivers/TFT_Driver/TFT_Driver.o
+ .debug_ranges  0x00000098       0x20 Drivers/USART_Driver/USART_Driver.o
+ .debug_ranges  0x000000b8       0x68 main.o
 
 .debug_macro
  *(.debug_macro)

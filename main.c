@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <avr/interrupt.h>
 #include "USART_Driver.h"
+#include "TFT_driver.h"
 
 #define BAUD 9600
 #define MYUBRR (F_CPU/16/BAUD - 1) // Set baud rate for UART
@@ -19,19 +20,22 @@ volatile uint8_t emg_buffer_full = 0;			// Flag for when sample buffer is full a
 
 
 void pwm_init(void) {
-	// Set PE3 (OC3A, Arduino Mega Pin 5) as output
-	DDRE |= (1 << PE3);
-	
-	// Fast PWM with ICR3 as TOP, Non-inverted PWM
-	TCCR3A = (1 << COM3A1) | (1 << WGM31);
-	TCCR3B = (1 << WGM33) | (1 << WGM32) | (1 << CS31) | (1 << CS30); // Prescaler 64
-	
-	ICR3 = 4999; // TOP ? sets PWM frequency to 50 Hz
+	// Set PH5 (OC4C, Arduino Pin 8) as output
+	DDRH |= (1 << PH5);
+
+	// Fast PWM with ICR4 as TOP, non-inverted PWM on OC4C
+	TCCR4A = (1 << COM4C1);              // Clear OC4C on Compare Match
+	TCCR4B = (1 << WGM43) | (1 << WGM42) // Fast PWM, mode 14 (ICR TOP)
+	| (1 << CS41) | (1 << CS40);  // Prescaler 64
+
+	ICR4 = 4999;  // TOP ? 50 Hz PWM
 }
 
+
 void pwm_set_duty(uint16_t duty_percent) {
-	OCR3A = (uint32_t)ICR3 * duty_percent / 100;
+	OCR4C = (uint32_t)ICR4 * duty_percent / 100;
 }
+
 
 
 
@@ -86,6 +90,10 @@ int main(void) {
 	USART0_Init(MYUBRR);
 	adc_init();
 	pwm_init();
+	DisplayInit();
+	InitCoordinate();
+
+	uint16_t x = 319;
 
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
@@ -93,6 +101,8 @@ int main(void) {
 	uint16_t overThreshold = 0;
 	uint16_t underThreshold = 0;
 	char buffer[10];  // Enough for millivolt values (max "5000\0")
+	
+	
 	
 	// Set pin 13 (PB7) as output for debugging
 	DDRB |= (1 << PB7);
@@ -118,6 +128,18 @@ int main(void) {
 			
 			// Send newline
 			USART0_Transmit('\n');
+			
+			// Scale ADC output into TFT y-axis range
+			uint16_t mapped_sample = ((rms_mv * 239UL) / 2000);
+
+
+			DrawEMG(mapped_sample, x);
+
+			x--;
+			if (x <= 0) {
+				x = 319;
+				InitCoordinate(); // Clear and redraw axis
+			}
 			
 			// If 50ms window RMS value above threshold
 			if (rms_mv >= threshold) {

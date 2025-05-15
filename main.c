@@ -19,6 +19,9 @@ volatile uint16_t emg_index = 0;				// For knowing buffer index
 volatile uint8_t emg_buffer_full = 0;			// Flag for when sample buffer is full and calculations should be triggered
 
 
+/*******************************************************PWM*************************************************************/
+// Initializes PWM for motor control
+// PWM frequency is 50 Hz (20 ms period) with 16 MHz clock and prescaler 64
 void pwm_init(void) {
 	// Set PH5 (OC4C, Arduino Pin 8) as output
 	DDRH |= (1 << PH5);
@@ -31,12 +34,13 @@ void pwm_init(void) {
 	ICR4 = 4999;  // TOP ? 50 Hz PWM
 }
 
-
+// Set duty cycle for motor control
+// duty_percent is a value between 0 and 100
 void pwm_set_duty(uint16_t duty_percent) {
 	OCR4C = (uint32_t)ICR4 * duty_percent / 100;
 }
 
-
+/***********************************************************************************************************************/
 
 
 /*******************************************************ADC*************************************************************/
@@ -50,7 +54,9 @@ void adc_init(void) {
 }
 /***********************************************************************************************************************/
 
+
 /*******************************************************ISR*************************************************************/
+// ADC ISR for reading EMG samples, storing in buffer and raising flag when buffer full (50 ms)
 ISR(ADC_vect) {
 	emg_samples[emg_index++] = ADC;
 
@@ -63,7 +69,9 @@ ISR(ADC_vect) {
 }
 /***********************************************************************************************************************/
 
+
 /*****************************************SIGNAL CONDITIONING***********************************************************/
+// Calculate RMS value from EMG samples when buffer is full
 uint16_t calculate_RMS(void) {
 	
 	// Summing all samples in buffer
@@ -92,6 +100,24 @@ uint16_t calculate_RMS(void) {
 }
 /************************************************************************************************************************/
 
+/************************************************MOTOR MOVEMENTS******************************************************* */
+// Close hand
+void closeHand(void){
+	pwm_set_duty(6); // Move motor
+	_delay_ms(500); // Let motor move
+	pwm_set_duty(0); // Stop motor
+}
+
+// Open hand
+void openHand(void){
+	pwm_set_duty(9); // Move motor
+	_delay_ms(475); // Let motor move
+	pwm_set_duty(0); // Stop motor
+}
+/************************************************************************************************************************/
+
+
+
 int main(void) {
 
 	USART0_Init(MYUBRR);
@@ -101,7 +127,6 @@ int main(void) {
 	InitCoordinate();
 	
 	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
-
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
 	uint16_t threshold = 200; //Threshold in mV for when to move motor
@@ -157,10 +182,8 @@ int main(void) {
 				
 				if (overThreshold == 3) { // If RMS above threshold for 3 full windows (150 ms)
 					PORTB |= (1 << PB7); // Turn ON LED (debugging)
-					pwm_set_duty(6); // Move motor
-					_delay_ms(500); // Let motor move
-					pwm_set_duty(0); // Stop motor
-					underThreshold = 0; // Restart threshold 
+					closeHand(); // Move motor
+					underThreshold = 0; // Reset under threshold => Could otherwise have old values and trigger open hand very fast
 				}
 			}
 
@@ -170,10 +193,8 @@ int main(void) {
 				
 				if (underThreshold == 5) { // If RMS below threshold for 5 full windows (250ms)
 					PORTB &= ~(1 << PB7); // Turn OFF LED (debugging)
-					pwm_set_duty(9); // Move motor
-					_delay_ms(475); // Let motor move
-					pwm_set_duty(0); // Stop motor
-					overThreshold = 0; // Restart threshold
+					openHand(); // Move motor
+					overThreshold = 0; // Reset over threshold threshold => Could otherwise have old values and trigger close hand very fast
 				}
 			}
 		}

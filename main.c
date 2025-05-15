@@ -65,23 +65,30 @@ ISR(ADC_vect) {
 
 /*****************************************SIGNAL CONDITIONING***********************************************************/
 uint16_t calculate_RMS(void) {
-
+	
+	// Summing all samples in buffer
 	uint32_t sum = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
 		sum += emg_samples[i];
 	}
+	
+	// Calculate mean
 	uint16_t mean = sum / BUFFER_SIZE;
-
+	
+	// Subtract mean and calculate squares (Equivalent for mean of squares)
 	uint32_t sum_squares = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		int16_t centered_sample = (int16_t)emg_samples[i] - (int16_t)mean;
+		int16_t centered_sample = (int16_t)emg_samples[i] - (int16_t)mean; // Removing DC component makes RMS calculation of true AC component
 		sum_squares += (uint32_t)centered_sample * (uint32_t)centered_sample;
 	}
-
+	
+	// Mean square
 	uint32_t mean_square = sum_squares / BUFFER_SIZE;
+	
+	// Compute square root
 	uint16_t rms = (uint16_t)sqrt((double)mean_square);
 
-	return rms;  // 0..1023 ? ADC range RMS (centered)
+	return rms; 
 }
 /************************************************************************************************************************/
 
@@ -92,8 +99,8 @@ int main(void) {
 	pwm_init();
 	DisplayInit();
 	InitCoordinate();
-
-	uint16_t x = 319;
+	
+	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
 
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
@@ -104,7 +111,7 @@ int main(void) {
 	
 	
 	
-	// Set pin 13 (PB7) as output for debugging
+	// Set pin 13 (PB7) as output for debugging (LED)
 	DDRB |= (1 << PB7);
 	
 	
@@ -134,8 +141,11 @@ int main(void) {
 
 
 			DrawEMG(mapped_sample, x);
-
+			
+			// increment x-axis position
 			x--;
+			
+			// If x has reached 0 (rightmost) restart screen with coordinate
 			if (x <= 0) {
 				x = 319;
 				InitCoordinate(); // Clear and redraw axis
@@ -145,12 +155,12 @@ int main(void) {
 			if (rms_mv >= threshold) {
 				overThreshold++;
 				
-				if (overThreshold == 3) {
-					PORTB |= (1 << PB7); // Turn ON LED
-					pwm_set_duty(6);
-					_delay_ms(500);
-					pwm_set_duty(0);
-					underThreshold = 0;
+				if (overThreshold == 3) { // If RMS above threshold for 3 full windows (150 ms)
+					PORTB |= (1 << PB7); // Turn ON LED (debugging)
+					pwm_set_duty(6); // Move motor
+					_delay_ms(500); // Let motor move
+					pwm_set_duty(0); // Stop motor
+					underThreshold = 0; // Restart threshold 
 				}
 			}
 
@@ -158,12 +168,12 @@ int main(void) {
 			if (rms_mv <= threshold) {
 				underThreshold++;
 				
-				if (underThreshold == 5) {
-					PORTB &= ~(1 << PB7); // Turn OFF LED
-					pwm_set_duty(9);
-					_delay_ms(475);
-					pwm_set_duty(0);
-					overThreshold = 0;
+				if (underThreshold == 5) { // If RMS below threshold for 5 full windows (250ms)
+					PORTB &= ~(1 << PB7); // Turn OFF LED (debugging)
+					pwm_set_duty(9); // Move motor
+					_delay_ms(475); // Let motor move
+					pwm_set_duty(0); // Stop motor
+					overThreshold = 0; // Restart threshold
 				}
 			}
 		}

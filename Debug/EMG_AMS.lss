@@ -1097,16 +1097,17 @@ uint16_t calculate_RMS(void) {
  696:	df 92       	push	r13
  698:	ef 92       	push	r14
  69a:	ff 92       	push	r15
-
+	
+	// Summing all samples in buffer
 	uint32_t sum = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
  69c:	80 e0       	ldi	r24, 0x00	; 0
  69e:	90 e0       	ldi	r25, 0x00	; 0
-/***********************************************************************************************************************/
 
 /*****************************************SIGNAL CONDITIONING***********************************************************/
 uint16_t calculate_RMS(void) {
-
+	
+	// Summing all samples in buffer
 	uint32_t sum = 0;
  6a0:	40 e0       	ldi	r20, 0x00	; 0
  6a2:	50 e0       	ldi	r21, 0x00	; 0
@@ -1125,10 +1126,10 @@ uint16_t calculate_RMS(void) {
  6b8:	53 1f       	adc	r21, r19
  6ba:	61 1d       	adc	r22, r1
  6bc:	71 1d       	adc	r23, r1
-
 /*****************************************SIGNAL CONDITIONING***********************************************************/
 uint16_t calculate_RMS(void) {
-
+	
+	// Summing all samples in buffer
 	uint32_t sum = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
  6be:	01 96       	adiw	r24, 0x01	; 1
@@ -1138,6 +1139,8 @@ uint16_t calculate_RMS(void) {
  6c6:	80 f3       	brcs	.-32     	; 0x6a8 <calculate_RMS+0x1c>
 		sum += emg_samples[i];
 	}
+	
+	// Calculate mean
 	uint16_t mean = sum / BUFFER_SIZE;
  6c8:	cb 01       	movw	r24, r22
  6ca:	ba 01       	movw	r22, r20
@@ -1148,16 +1151,17 @@ uint16_t calculate_RMS(void) {
  6d4:	b9 d1       	rcall	.+882    	; 0xa48 <__udivmodsi4>
  6d6:	49 01       	movw	r8, r18
  6d8:	5a 01       	movw	r10, r20
-
+	
+	// Subtract mean and calculate squares (Equivalent for mean of squares)
 	uint32_t sum_squares = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
  6da:	40 e0       	ldi	r20, 0x00	; 0
  6dc:	50 e0       	ldi	r21, 0x00	; 0
-	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		sum += emg_samples[i];
-	}
+	
+	// Calculate mean
 	uint16_t mean = sum / BUFFER_SIZE;
-
+	
+	// Subtract mean and calculate squares (Equivalent for mean of squares)
 	uint32_t sum_squares = 0;
  6de:	c1 2c       	mov	r12, r1
  6e0:	d1 2c       	mov	r13, r1
@@ -1181,10 +1185,10 @@ uint16_t calculate_RMS(void) {
  6fe:	d7 1e       	adc	r13, r23
  700:	e8 1e       	adc	r14, r24
  702:	f9 1e       	adc	r15, r25
-		sum += emg_samples[i];
-	}
+	// Calculate mean
 	uint16_t mean = sum / BUFFER_SIZE;
-
+	
+	// Subtract mean and calculate squares (Equivalent for mean of squares)
 	uint32_t sum_squares = 0;
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
  704:	4f 5f       	subi	r20, 0xFF	; 255
@@ -1215,7 +1219,7 @@ uint16_t calculate_RMS(void) {
  72a:	a2 d0       	rcall	.+324    	; 0x870 <__fixunssfsi>
  72c:	cb 01       	movw	r24, r22
 
-	return rms;  // 0..1023 ? ADC range RMS (centered)
+	return rms; 
 }
  72e:	ff 90       	pop	r15
  730:	ef 90       	pop	r14
@@ -1260,7 +1264,7 @@ int main(void) {
 	
 	
 	
-	// Set pin 13 (PB7) as output for debugging
+	// Set pin 13 (PB7) as output for debugging (LED)
 	DDRB |= (1 << PB7);
  766:	84 b9       	out	0x04, r24	; 4
  768:	c1 2c       	mov	r12, r1
@@ -1273,7 +1277,7 @@ int main(void) {
 	uint16_t underThreshold = 0;
  76c:	e1 2c       	mov	r14, r1
  76e:	f1 2c       	mov	r15, r1
-	uint16_t x = 319;
+	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
 
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
@@ -1285,8 +1289,8 @@ int main(void) {
 	pwm_init();
 	DisplayInit();
 	InitCoordinate();
-
-	uint16_t x = 319;
+	
+	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
  774:	80 91 00 02 	lds	r24, 0x0200	; 0x800200 <__DATA_REGION_ORIGIN__>
 	
 	

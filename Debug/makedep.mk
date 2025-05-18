@@ -4,6 +4,8 @@
 
 Drivers\TFT_Driver\TFT_Driver.c
 
+Drivers\TFT_Driver\XPT2046_Driver.c
+
 Drivers\USART_Driver\USART_Driver.c
 
 main.c

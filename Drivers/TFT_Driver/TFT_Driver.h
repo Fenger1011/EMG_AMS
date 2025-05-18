@@ -44,5 +44,6 @@ void DrawVerticalLine(uint16_t x, uint16_t y_start, uint16_t y_end, uint8_t Red,
 void DrawHorizontalLine(uint16_t y, uint16_t x_start, uint16_t x_end, uint8_t Red, uint8_t Green, uint8_t Blue);
 void InitCoordinate();
 void DrawEMG(uint8_t sample, uint16_t PageAddress);
+void DrawSquare(uint16_t x_start, uint16_t y_start, uint16_t size, uint8_t Red, uint8_t Green, uint8_t Blue);
 
 #endif // TFT_DRIVER_H

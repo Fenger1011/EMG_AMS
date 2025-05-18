@@ -61,11 +61,11 @@ void pulseWR(void){
 
 // ILI 9341 data sheet, page 238
 void WriteCommand(unsigned char command){
-	 // Data set up (commands only use the lower byte of the data bus)
+	// Data set up (commands only use the lower byte of the data bus)
 	DATA_PORT_LOW = command;
 	
 	// DC low = command
-	DC_PORT &= ~(1 << DC_BIT); 
+	DC_PORT &= ~(1 << DC_BIT);
 	
 	// CS low = chip selected
 	CS_PORT &= ~(1 << CS_BIT);
@@ -118,7 +118,7 @@ void DisplayInit(){
 	
 	// Display OFF (turn off display)
 	WriteCommand(0x28);
-		
+	
 	//  // 4. Initialization sequence (from ILI9341 datasheet / working reference)
 
 	WriteCommand(0xCF);
@@ -239,22 +239,6 @@ void DisplayOn(){
 	WriteCommand(0x29);
 }
 
-void SleepOut()
-{
-}
-
-void MemoryAccessControl(unsigned char parameter)
-{
-}
-
-void InterfacePixelFormat(unsigned char parameter)
-{
-}
-
-void MemoryWrite()
-{
-}
-
 // Red 0-31, Green 0-63, Blue 0-31
 void WritePixel(unsigned char Red, unsigned char Green, unsigned char Blue){
 	// Convert 5-6-5 RGB to 16-bit value
@@ -344,3 +328,22 @@ void DrawEMG(uint8_t sample, uint16_t x)
 	WriteCommand(0x2C);  // Memory Write
 	WritePixel(31, 0, 0);  // Dark blue pixel
 }
+
+void DrawSquare(uint16_t x_start, uint16_t y_start, uint16_t size, uint8_t Red, uint8_t Green, uint8_t Blue)
+{
+	uint16_t x_end = x_start + size - 1;
+	uint16_t y_end = y_start + size - 1;
+
+	SetColumnAddress(x_start, x_end);
+	SetPageAddress(y_start, y_end);
+	WriteCommand(0x2C);  // Memory Write
+
+	for (uint16_t y = y_start; y <= y_end; y++)
+	{
+		for (uint16_t x = x_start; x <= x_end; x++)
+		{
+			WritePixel(Red, Green, Blue);
+		}
+	}
+}
+

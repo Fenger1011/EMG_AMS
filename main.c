@@ -8,6 +8,7 @@
 #include <avr/interrupt.h>
 #include "USART_Driver.h"
 #include "TFT_driver.h"
+#include "XPT2046_Driver.h"
 
 #define BAUD 9600
 #define MYUBRR (F_CPU/16/BAUD - 1) // Set baud rate for UART
@@ -124,7 +125,8 @@ int main(void) {
 	adc_init();
 	pwm_init();
 	DisplayInit();
-	InitCoordinate();
+	
+	// InitCoordinate();
 	
 	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
 	uint16_t rms_adc = 0;

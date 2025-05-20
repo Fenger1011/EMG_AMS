@@ -62,9 +62,9 @@ void uart_print(const char* str) {
 }
 
 void uart_print_num(uint16_t num) {
-	char buf[7];
-	snprintf(buf, sizeof(buf), "%u", num);
-	uart_print(buf);
+	char buf[7];							// Buffer to hold the ASCII representation of number, uint16_t is max 5 digits, add null terminator and redundancy = 7
+	snprintf(buf, sizeof(buf), "%u", num);	// Convert uint16_t to string, %u formats as unsigned decimal number
+	uart_print(buf);						// Send buffer over UART
 }
 
 // ========== SPI Bit-Bang Functions ==========
@@ -93,6 +93,19 @@ uint16_t spi_read12() {
 	return result;
 }
 
+void init_pins() {
+	// Outputs
+	SET(D_CS_PORT, D_CS_PIN);		// Set CS = LOW (do this before setting as output!)
+	D_CS_DDR |= (1 << D_CS_PIN);	// CS
+	D_CLK_DDR |= (1 << D_CLK_PIN);	// CLK
+	D_IN_DDR  |= (1 << D_IN_PIN);	// MOSI
+
+	// Inputs
+	DDRE &= ~(1 << D_OUT_PIN);		// MISO
+	DDRE &= ~(1 << D_IRQ_PIN);		// IRQ
+	PORTE |=  (1 << D_IRQ_PIN);	    // pull-up on IRQ (active low, ISR trigger on falling edge)
+}
+
 // ========== Interrupt Setup ==========
 // External interrupt on pin PE4 = IRQ pin
 void InitTouchInterrupt() {
@@ -106,23 +119,8 @@ void InitTouchInterrupt() {
 	EIMSK |=  (1 << INT4);    // enable INT4
 }
 
-// ========== ISR: Touch Trigger ==========
 ISR(INT4_vect) {
 	touch_triggered = 1; // Flag for when touch triggered
-}
-
-// ========== Pin Initialization ==========
-void init_pins() {
-	// Outputs
-	SET(D_CS_PORT, D_CS_PIN);		// Set CS = LOW (do this before setting as output!)
-	D_CS_DDR |= (1 << D_CS_PIN);	// CS
-	D_CLK_DDR |= (1 << D_CLK_PIN);	// CLK
-	D_IN_DDR  |= (1 << D_IN_PIN);	// MOSI
-
-	// Inputs
-	DDRE &= ~(1 << D_OUT_PIN);		// MISO
-	DDRE &= ~(1 << D_IRQ_PIN);		// IRQ
-	PORTE |=  (1 << D_IRQ_PIN);	    // pull-up on IRQ (active low, ISR trigger on falling edge)
 }
 
 

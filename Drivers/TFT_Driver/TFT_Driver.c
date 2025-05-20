@@ -319,15 +319,21 @@ void InitCoordinate() {
 
 void DrawEMG(uint8_t sample, uint16_t x)
 {
-	// Map 0–255 sample to Y screen coordinate (0 = bottom, 239 = top)
-	// 239 - (sample * 240 / 256) flips Y axis (so 0 = bottom)
 	uint16_t y = 239 - ((sample * 240UL) / 256);
 
-	SetColumnAddress(y, y);
-	SetPageAddress(x,x);
+	if (x > 318) x = 318;
+	if (y > 238) y = 238;
+
+	SetColumnAddress(y, y + 2);
+	SetPageAddress(x, x + 2);
 	WriteCommand(0x2C);  // Memory Write
-	WritePixel(31, 0, 0);  // Dark blue pixel
+
+	for (uint8_t i = 0; i < 9; i++)  // 3x3 = 9 pixels
+	{
+		WritePixel(31, 0, 0);  // RGB565 red
+	}
 }
+
 
 void DrawSquare(uint16_t x_start, uint16_t y_start, uint16_t size, uint8_t Red, uint8_t Green, uint8_t Blue)
 {

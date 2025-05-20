@@ -128,19 +128,15 @@ int main(void) {
 	InitTouchInterrupt();	// Initialize for falling edge interrupt
 	sei();					// Global interrupts
 	init_pins();			// Pins for bit-banged SPI
-	
-	CalibrateTouchScreen();
-	// InitCoordinate();	// Display coordinate system
-	
-	uint16_t x_calibrated, y_calibrated;
-	GetCoordinates(&x_calibrated, &y_calibrated); // Test if different from CalibrateTouchScreen();
+	CalibrateTouchScreen();	// Calibrate touch screen
+	InitCoordinate();		// Display coordinate system
 	
 	uint16_t x = 319;				// Start coordinate for x-axis (Helt til venstre)
-	uint16_t rms_adc = 0;
-	uint32_t rms_mv = 0;
-	uint16_t threshold = 200;		//Threshold in mV for when to move motor
-	uint16_t overThreshold = 0;
-	uint16_t underThreshold = 0;
+	uint16_t rms_adc = 0;			// Hold RMS value of ADC in V
+	uint32_t rms_mv = 0;			// Hold RMS value of ADC in mV
+	uint16_t threshold = 200;		// Threshold in mV for when to move motor
+	uint16_t overThreshold = 0;		// Flag for when ADC rms is over threshold 
+	uint16_t underThreshold = 0;	// Flag for when ADC rms is below threshold
 	char buffer[10];				// Enough for millivolt values (max "5000\0")
 	
 	DDRB |= (1 << PB7);	// Set pin 13 (PB7) as output for debugging (LED)
@@ -150,7 +146,6 @@ int main(void) {
 	while (1) 
 	{
 		
-		/*
 		// Check if EMG buffer is full (ISR sets this flag)
 		if (emg_buffer_full) {
 			emg_buffer_full = 0;  // Clear flag
@@ -176,10 +171,10 @@ int main(void) {
 			DrawEMG(mapped_sample, x);
 			
 			// increment x-axis position
-			x--;
+			x -= 3;
 			
 			// If x has reached 0 (rightmost) restart screen with coordinate
-			if (x <= 0) {
+			if (x <= 1) {
 				x = 319;
 				InitCoordinate(); // Clear and redraw axis
 			}
@@ -205,6 +200,6 @@ int main(void) {
 					overThreshold = 0; // Reset over threshold threshold => Could otherwise have old values and trigger close hand very fast
 				}
 			}
-		}*/
+		}
 	} 
 }

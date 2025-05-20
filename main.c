@@ -121,30 +121,36 @@ void openHand(void){
 
 int main(void) {
 
-	USART0_Init(MYUBRR);
-	adc_init();
-	pwm_init();
-	DisplayInit();
+	USART0_Init(MYUBRR);	// Initialize UART
+	adc_init();				// Initialize ADC
+	pwm_init();				// Initialize PWM
+	DisplayInit();			// Initialize TFT
+	InitTouchInterrupt();	// Initialize for falling edge interrupt
+	sei();					// Global interrupts
+	init_pins();			// Pins for bit-banged SPI
 	
-	// InitCoordinate();
+	CalibrateTouchScreen();
+	// InitCoordinate();	// Display coordinate system
 	
-	uint16_t x = 319; // Start coordinate for x-axis (Helt til venstre)
+	uint16_t x_calibrated, y_calibrated;
+	GetCoordinates(&x_calibrated, &y_calibrated); // Test if different from CalibrateTouchScreen();
+	
+	uint16_t x = 319;				// Start coordinate for x-axis (Helt til venstre)
 	uint16_t rms_adc = 0;
 	uint32_t rms_mv = 0;
-	uint16_t threshold = 200; //Threshold in mV for when to move motor
+	uint16_t threshold = 200;		//Threshold in mV for when to move motor
 	uint16_t overThreshold = 0;
 	uint16_t underThreshold = 0;
-	char buffer[10];  // Enough for millivolt values (max "5000\0")
+	char buffer[10];				// Enough for millivolt values (max "5000\0")
+	
+	DDRB |= (1 << PB7);	// Set pin 13 (PB7) as output for debugging (LED)
 	
 	
 	
-	// Set pin 13 (PB7) as output for debugging (LED)
-	DDRB |= (1 << PB7);
-	
-	
-	
-	while (1) {
-
+	while (1) 
+	{
+		
+		/*
 		// Check if EMG buffer is full (ISR sets this flag)
 		if (emg_buffer_full) {
 			emg_buffer_full = 0;  // Clear flag
@@ -199,6 +205,6 @@ int main(void) {
 					overThreshold = 0; // Reset over threshold threshold => Could otherwise have old values and trigger close hand very fast
 				}
 			}
-		}
-	}
+		}*/
+	} 
 }

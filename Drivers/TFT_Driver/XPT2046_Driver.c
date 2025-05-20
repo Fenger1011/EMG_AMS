@@ -41,18 +41,23 @@ volatile uint8_t touch_triggered = 0;
 
 // ========== UART Functions ==========
 void uart_init() {
-	UBRR0H = 0;
-	UBRR0L = 103;  // 9600 baud at 16MHz
-	UCSR0B = (1 << TXEN0);
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);
+	UBRR0H = 0;								// 9600 baud at 16MHz						
+	UBRR0L = 103;							// 9600 baud at 16MHz
+	UCSR0B = (1 << TXEN0);					// Enable transmitter of USART0
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);	// 8N1 data format, 8 data bits, no parity, 1 stop bit
 }
 
 void uart_tx(char c) {
-	while (!(UCSR0A & (1 << UDRE0)));
-	UDR0 = c;
+	while (!(UCSR0A & (1 << UDRE0)));	// Wait until transmit buffer (UDR0) is empty
+	UDR0 = c;							// Put character c into buffer -> this sends the character
 }
 
 void uart_print(const char* str) {
+	
+	// Loops while current character pointed to by str is not null -> (\0) is the end of a string in C!
+		// *str dereferences the pointer to get current character
+		// uart_tx(); sends current character over UART
+		// str++ increments the pointer to the next character in string 
 	while (*str) uart_tx(*str++);
 }
 
@@ -90,7 +95,7 @@ uint16_t spi_read12() {
 
 // ========== Interrupt Setup ==========
 // External interrupt on pin PE4 = IRQ pin
-void init_interrupt() {
+void InitTouchInterrupt() {
 	
 	// Trigger interrupt on PE4 falling edge
 	EICRB |=  (1 << ISC41);
@@ -139,8 +144,11 @@ void GetRawCoordinates(uint16_t* x_raw, uint16_t* y_raw) {
 
 // ============= Calibrate Touchscreen =============
 void CalibrateTouchScreen() {
+	// Fill background with white
+	BackgroundColor(31, 62, 31);
+	
 	// Show square in upper leftmost corner
-	DrawSquare(0, 220, 20, 31, 62, 0);
+	DrawSquare(0, 300, 20, 0, 0, 31);
 
 	uint16_t x, y;
 
@@ -151,25 +159,32 @@ void CalibrateTouchScreen() {
 		GetRawCoordinates(&x, &y);
 		x_min = x;
 		y_min = y;
-
+		
+		/************* DEBUG *************
 		uart_print("x_min: ");
 		uart_print_num(x_min);
 		uart_print(", y_min: ");
 		uart_print_num(y_min);
 		uart_print("\r\n");
+		********************************/
 
 		while (!READ(D_IRQ_PINR, D_IRQ_PIN));  // Wait for release
 		
+		// Debounce
+		_delay_ms(10);
+		
+		// Set background to white again
 		BackgroundColor(31, 62, 31);
 	}
 	
 	// Set = 0 here and not start of while statement, because the interrupt will run again too soon.
 	touch_triggered = 0;
 	
-	_delay_ms(20); // Debounce
+	// Debounce lifting finger
+	_delay_ms(20);
 
 	// Show square in bottom rightmost corner
-	DrawSquare(320, 0, 20, 31, 62, 0);
+	DrawSquare(220, 0, 20, 0, 0, 31);
 
 	// Wait for second touch (bottom right)
 	while (!touch_triggered);
@@ -180,14 +195,21 @@ void CalibrateTouchScreen() {
 		x_max = x;
 		y_max = y;
 
+		/************* DEBUG ***************
 		uart_print("x_max: ");
 		uart_print_num(x_max);
 		uart_print(", y_max: ");
 		uart_print_num(y_max);
 		uart_print("\r\n");
-
+		***********************************/
+		
+		_delay_ms(10);
 		while (!READ(D_IRQ_PINR, D_IRQ_PIN));  // Wait for release
+		
+		BackgroundColor(31, 62, 31);
 	}
+	
+	touch_triggered = 0;
 }
 
 
@@ -195,45 +217,51 @@ void CalibrateTouchScreen() {
 // ================= Get Calibrated X/Y coordinates =====================
 void GetCoordinates(uint16_t* x, uint16_t* y) {
 	uint16_t x_raw, y_raw;
-	GetRawCoordinates(&x_raw, &y_raw);
 	
-	
-	if (x_max == x_min || y_max == y_min) {
-		*x = 0;
-		*y = 0;
-		return; // Avoid division by zero
+	// Wait for touch
+	while (!touch_triggered);
+
+	if (!READ(D_IRQ_PINR, D_IRQ_PIN)) {
+		
+		// Get the raw coordinates
+		GetRawCoordinates(&x_raw, &y_raw);
+		
+		// Set x_max=x_min, y_max=y_min if equal to avoid division by 0
+		if (x_max == x_min || y_max == y_min) {
+			*x = 0;
+			*y = 0;
+			return;
+		}
+
+		// Map raw values to screen coordinates
+		int32_t x_temp = ((int32_t)(x_raw - x_min)) * SCREEN_WIDTH / (x_max - x_min);
+		int32_t y_temp = ((int32_t)(y_raw - y_min)) * SCREEN_HEIGHT / (y_max - y_min);
+
+		// Make sure calculated x and y are within borders
+		// If not make equal to borders
+		if (x_temp < 0) x_temp = 0;
+		if (x_temp > SCREEN_WIDTH) x_temp = SCREEN_WIDTH;
+		if (y_temp < 0) y_temp = 0;
+		if (y_temp > SCREEN_HEIGHT) y_temp = SCREEN_HEIGHT;
+
+		*x = (uint16_t)x_temp;
+		*y = (uint16_t)y_temp;
+		
+		/*************** DEBUG *****************
+		uart_print("x_calibrated: ");
+		uart_print_num(*x);
+		uart_print(", y_claibrated: ");
+		uart_print_num(*y);
+		uart_print("\r\n");
+
+		***************************************/
+		
+		while (!READ(D_IRQ_PINR, D_IRQ_PIN));  // Wait for release
+		
+		// Debounce
+		_delay_ms(10);
 	}
-
-	// Map raw values to screen coordinates
-	int32_t x_temp = ((int32_t)(x_raw - x_min)) * SCREEN_WIDTH / (x_max - x_min);
-	int32_t y_temp = ((int32_t)(y_raw - y_min)) * SCREEN_HEIGHT / (y_max - y_min);
-
-	// Make sure calculated x and y are within borders
-	// If not make equal to borders
-	if (x_temp < 0) x_temp = 0;
-	if (x_temp > SCREEN_WIDTH) x_temp = SCREEN_WIDTH;
-	if (y_temp < 0) y_temp = 0;
-	if (y_temp > SCREEN_HEIGHT) y_temp = SCREEN_HEIGHT;
-
-	*x = (uint16_t)x_temp;
-	*y = (uint16_t)y_temp;
-}
-
-
-
-
-// ========== Main ==========
-int main(void) {
-	uart_init();
-	init_pins();
-	init_interrupt();
-	sei();
 	
-	// Values for holding x and y coordinates
-	uint16_t x, y;
-	
-	CalibrateTouchScreen();
-	
-	while (1) {
-	}
+	// Set = 0 here and not start of while statement, because the interrupt will run again too soon.
+	touch_triggered = 0;
 }

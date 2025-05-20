@@ -51,7 +51,7 @@ void spi_write(uint8_t data);
 uint16_t spi_read12(void);
 
 // Interrupts
-void init_interrupt(void);
+void InitTouchInterrupt(void);
 
 // Touch Handling
 void init_pins(void);

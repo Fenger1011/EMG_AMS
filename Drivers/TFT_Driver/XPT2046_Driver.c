@@ -37,7 +37,7 @@ static uint16_t x_min, x_max = 0;	// For raw x-coordinate during calibration
 static uint16_t y_min, y_max = 0;	// For raw y-coordinate during calibration
 
 // ========== Global Variables ==========
-volatile uint8_t touch_triggered = 0;
+volatile uint8_t touch_triggered = 0; // Global interrupt variable for when screen is touched
 
 // ========== UART Functions ==========
 void uart_init() {

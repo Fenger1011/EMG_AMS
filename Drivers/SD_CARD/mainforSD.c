@@ -1,3 +1,4 @@
+/*
 #include <avr/io.h>
 #define F_CPU 16000000UL  // Or your actual clock in Hz, e.g., 16000000UL for Mega 2560
 #include <util/delay.h>
@@ -30,3 +31,4 @@ int main(void) {
 	// Done, loop forever
 	while (1);
 }
+*/

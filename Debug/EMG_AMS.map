@@ -17,7 +17,7 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(fp_norm2.o)
                               c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libm.a(sqrt.o) (__fp_norm2)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_udivmodsi4.o)
-                              main.o (__udivmodsi4)
+                              Drivers/SD_CARD/ff.o (__udivmodsi4)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_divmodsi4.o)
                               Drivers/TFT_Driver/XPT2046_Driver.o (__divmodsi4)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_negsi2.o)
@@ -25,9 +25,9 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
                               C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o (exit)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_copy_data.o)
-                              Drivers/TFT_Driver/XPT2046_Driver.o (__do_copy_data)
+                              Drivers/SD_CARD/ff.o (__do_copy_data)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_clear_bss.o)
-                              Drivers/TFT_Driver/XPT2046_Driver.o (__do_clear_bss)
+                              Drivers/SD_CARD/ff.o (__do_clear_bss)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o)
                               main.o (__mulhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_umulhisi3.o)
@@ -35,7 +35,7 @@ c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/..
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_usmulhisi3.o)
                               c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_mulhisi3.o) (__usmulhisi3_tail)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_muluhisi3.o)
-                              main.o (__muluhisi3)
+                              Drivers/SD_CARD/ff.o (__muluhisi3)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(itoa_ncheck.o)
                               main.o (__itoa_ncheck)
 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr6\libc.a(utoa_ncheck.o)
@@ -65,6 +65,155 @@ Discarded input sections
 
  .data          0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
  .bss           0x00000000        0x0 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
+ .text          0x00000000        0x0 Drivers/SD_CARD/ff.o
+ .data          0x00000000        0x0 Drivers/SD_CARD/ff.o
+ .bss           0x00000000        0x0 Drivers/SD_CARD/ff.o
+ .text.ld_word  0x00000000       0x14 Drivers/SD_CARD/ff.o
+ .text.ld_dword
+                0x00000000       0x36 Drivers/SD_CARD/ff.o
+ .text.st_word  0x00000000        0x8 Drivers/SD_CARD/ff.o
+ .text.st_dword
+                0x00000000        0xc Drivers/SD_CARD/ff.o
+ .text.mem_cpy  0x00000000       0x1e Drivers/SD_CARD/ff.o
+ .text.mem_set  0x00000000       0x12 Drivers/SD_CARD/ff.o
+ .text.mem_cmp  0x00000000       0x30 Drivers/SD_CARD/ff.o
+ .text.chk_chr  0x00000000       0x1a Drivers/SD_CARD/ff.o
+ .text.dbc_1st  0x00000000       0x2e Drivers/SD_CARD/ff.o
+ .text.dbc_2nd  0x00000000       0x32 Drivers/SD_CARD/ff.o
+ .text.clst2sect
+                0x00000000       0x5c Drivers/SD_CARD/ff.o
+ .text.ld_clust
+                0x00000000       0x5a Drivers/SD_CARD/ff.o
+ .text.st_clust
+                0x00000000       0x4a Drivers/SD_CARD/ff.o
+ .text.get_fileinfo
+                0x00000000       0xbc Drivers/SD_CARD/ff.o
+ .rodata.str1.1
+                0x00000000       0x18 Drivers/SD_CARD/ff.o
+ .text.create_name
+                0x00000000      0x196 Drivers/SD_CARD/ff.o
+ .text.get_ldnumber
+                0x00000000       0x70 Drivers/SD_CARD/ff.o
+ .text.validate
+                0x00000000       0x6a Drivers/SD_CARD/ff.o
+ .text.sync_window
+                0x00000000       0xb4 Drivers/SD_CARD/ff.o
+ .text.move_window
+                0x00000000       0x7c Drivers/SD_CARD/ff.o
+ .text.check_fs
+                0x00000000       0xf4 Drivers/SD_CARD/ff.o
+ .text.find_volume
+                0x00000000      0x10e Drivers/SD_CARD/ff.o
+ .text.mount_volume
+                0x00000000      0x506 Drivers/SD_CARD/ff.o
+ .text.put_fat  0x00000000      0x254 Drivers/SD_CARD/ff.o
+ .text.get_fat  0x00000000      0x1c4 Drivers/SD_CARD/ff.o
+ .text.dir_sdi  0x00000000      0x1cc Drivers/SD_CARD/ff.o
+ .text.create_chain
+                0x00000000      0x2a2 Drivers/SD_CARD/ff.o
+ .text.remove_chain
+                0x00000000      0x12a Drivers/SD_CARD/ff.o
+ .text.dir_remove
+                0x00000000       0x38 Drivers/SD_CARD/ff.o
+ .text.dir_clear
+                0x00000000       0xb2 Drivers/SD_CARD/ff.o
+ .text.dir_next
+                0x00000000      0x1f8 Drivers/SD_CARD/ff.o
+ .text.dir_find
+                0x00000000       0x80 Drivers/SD_CARD/ff.o
+ .text.follow_path
+                0x00000000       0xd4 Drivers/SD_CARD/ff.o
+ .text.dir_alloc
+                0x00000000       0x80 Drivers/SD_CARD/ff.o
+ .text.dir_register
+                0x00000000       0x68 Drivers/SD_CARD/ff.o
+ .text.dir_read
+                0x00000000       0x94 Drivers/SD_CARD/ff.o
+ .text.sync_fs  0x00000000       0xe2 Drivers/SD_CARD/ff.o
+ .text.f_mount  0x00000000       0x8a Drivers/SD_CARD/ff.o
+ .text.f_open   0x00000000      0x390 Drivers/SD_CARD/ff.o
+ .text.f_read   0x00000000      0x30a Drivers/SD_CARD/ff.o
+ .text.f_write  0x00000000      0x3e8 Drivers/SD_CARD/ff.o
+ .text.f_sync   0x00000000      0x110 Drivers/SD_CARD/ff.o
+ .text.f_close  0x00000000       0x3e Drivers/SD_CARD/ff.o
+ .text.f_lseek  0x00000000      0x3de Drivers/SD_CARD/ff.o
+ .text.f_opendir
+                0x00000000       0xc4 Drivers/SD_CARD/ff.o
+ .text.f_closedir
+                0x00000000       0x34 Drivers/SD_CARD/ff.o
+ .text.f_readdir
+                0x00000000       0x82 Drivers/SD_CARD/ff.o
+ .text.f_stat   0x00000000       0x7c Drivers/SD_CARD/ff.o
+ .text.f_getfree
+                0x00000000      0x208 Drivers/SD_CARD/ff.o
+ .text.f_truncate
+                0x00000000      0x174 Drivers/SD_CARD/ff.o
+ .text.f_unlink
+                0x00000000      0x144 Drivers/SD_CARD/ff.o
+ .text.f_mkdir  0x00000000      0x1d2 Drivers/SD_CARD/ff.o
+ .text.f_rename
+                0x00000000      0x210 Drivers/SD_CARD/ff.o
+ .bss.Fsid      0x00000000        0x2 Drivers/SD_CARD/ff.o
+ .bss.FatFs     0x00000000        0x2 Drivers/SD_CARD/ff.o
+ .debug_info    0x00000000     0x36d3 Drivers/SD_CARD/ff.o
+ .debug_abbrev  0x00000000      0x25d Drivers/SD_CARD/ff.o
+ .debug_loc     0x00000000     0x50c0 Drivers/SD_CARD/ff.o
+ .debug_aranges
+                0x00000000      0x1b8 Drivers/SD_CARD/ff.o
+ .debug_ranges  0x00000000      0x1a8 Drivers/SD_CARD/ff.o
+ .debug_line    0x00000000     0x21ed Drivers/SD_CARD/ff.o
+ .debug_str     0x00000000      0x725 Drivers/SD_CARD/ff.o
+ .comment       0x00000000       0x31 Drivers/SD_CARD/ff.o
+ .debug_frame   0x00000000      0xbdc Drivers/SD_CARD/ff.o
+ .text          0x00000000        0x0 Drivers/SD_CARD/mainforSD.o
+ .data          0x00000000        0x0 Drivers/SD_CARD/mainforSD.o
+ .bss           0x00000000        0x0 Drivers/SD_CARD/mainforSD.o
+ .debug_line    0x00000000        0x0 Drivers/SD_CARD/mainforSD.o
+ .debug_str     0x00000000      0x121 Drivers/SD_CARD/mainforSD.o
+ .comment       0x00000000       0x31 Drivers/SD_CARD/mainforSD.o
+ .text          0x00000000        0x0 Drivers/SD_CARD/SD_Driver.o
+ .data          0x00000000        0x0 Drivers/SD_CARD/SD_Driver.o
+ .bss           0x00000000        0x0 Drivers/SD_CARD/SD_Driver.o
+ .text.SPI_init
+                0x00000000       0x1a Drivers/SD_CARD/SD_Driver.o
+ .text.SPI_transmit
+                0x00000000        0xc Drivers/SD_CARD/SD_Driver.o
+ .text.SPI_receive
+                0x00000000        0x8 Drivers/SD_CARD/SD_Driver.o
+ .text.SPI_send_multi
+                0x00000000       0x2e Drivers/SD_CARD/SD_Driver.o
+ .text.SPI_receive_multi
+                0x00000000       0x3a Drivers/SD_CARD/SD_Driver.o
+ .text.SD_send_cmd
+                0x00000000       0x68 Drivers/SD_CARD/SD_Driver.o
+ .text.SD_init  0x00000000      0x116 Drivers/SD_CARD/SD_Driver.o
+ .text.SD_writeSingleBlock
+                0x00000000       0x72 Drivers/SD_CARD/SD_Driver.o
+ .text.SD_readSingleBlock
+                0x00000000       0x90 Drivers/SD_CARD/SD_Driver.o
+ .text.disk_status
+                0x00000000        0xe Drivers/SD_CARD/SD_Driver.o
+ .text.disk_initialize
+                0x00000000       0x2a Drivers/SD_CARD/SD_Driver.o
+ .text.disk_read
+                0x00000000       0x82 Drivers/SD_CARD/SD_Driver.o
+ .text.disk_write
+                0x00000000       0x82 Drivers/SD_CARD/SD_Driver.o
+ .text.disk_ioctl
+                0x00000000       0x5e Drivers/SD_CARD/SD_Driver.o
+ .text.get_fattime
+                0x00000000        0xa Drivers/SD_CARD/SD_Driver.o
+ .data.Stat     0x00000000        0x1 Drivers/SD_CARD/SD_Driver.o
+ .debug_info    0x00000000      0x945 Drivers/SD_CARD/SD_Driver.o
+ .debug_abbrev  0x00000000      0x1fa Drivers/SD_CARD/SD_Driver.o
+ .debug_loc     0x00000000      0xb72 Drivers/SD_CARD/SD_Driver.o
+ .debug_aranges
+                0x00000000       0x90 Drivers/SD_CARD/SD_Driver.o
+ .debug_ranges  0x00000000       0xc0 Drivers/SD_CARD/SD_Driver.o
+ .debug_line    0x00000000      0x629 Drivers/SD_CARD/SD_Driver.o
+ .debug_str     0x00000000      0x34a Drivers/SD_CARD/SD_Driver.o
+ .comment       0x00000000       0x31 Drivers/SD_CARD/SD_Driver.o
+ .debug_frame   0x00000000      0x1f8 Drivers/SD_CARD/SD_Driver.o
  .text          0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
  .data          0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
  .bss           0x00000000        0x0 Drivers/TFT_Driver/TFT_Driver.o
@@ -325,6 +474,9 @@ Linker script and memory map
 
 Address of section .data set to 0x800200
 LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
+LOAD Drivers/SD_CARD/ff.o
+LOAD Drivers/SD_CARD/mainforSD.o
+LOAD Drivers/SD_CARD/SD_Driver.o
 LOAD Drivers/TFT_Driver/TFT_Driver.o
 LOAD Drivers/TFT_Driver/XPT2046_Driver.o
 LOAD Drivers/USART_Driver/USART_Driver.o
@@ -887,13 +1039,13 @@ END GROUP
  .debug_abbrev  0x00000f87       0xb5 Drivers/USART_Driver/USART_Driver.o
  .debug_abbrev  0x0000103c      0x29e main.o
 
-.debug_line     0x00000000     0x13b5
+.debug_line     0x00000000     0x13b6
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1fa C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega2560/avr6/crtatmega2560.o
  .debug_line    0x000001fa      0x68b Drivers/TFT_Driver/TFT_Driver.o
  .debug_line    0x00000885      0x4df Drivers/TFT_Driver/XPT2046_Driver.o
  .debug_line    0x00000d64      0x11e Drivers/USART_Driver/USART_Driver.o
- .debug_line    0x00000e82      0x533 main.o
+ .debug_line    0x00000e82      0x534 main.o
 
 .debug_frame    0x00000000      0x4d8
  *(.debug_frame)

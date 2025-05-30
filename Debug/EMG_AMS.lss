@@ -19,7 +19,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 000012da  00000000  00000000  00003f60  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000013b5  00000000  00000000  0000523a  2**0
+  8 .debug_line   000013b6  00000000  00000000  0000523a  2**0
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  000004d8  00000000  00000000  000065f0  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -2027,7 +2027,7 @@ void ScreenA(void) {
 }
 
 void ScreenB(void) {
-	// Static or idle screen — draw once on entry only
+	// Static or idle screen ? draw once on entry only
 	BackgroundColor(31, 0, 0);  // Red background
  bcc:	40 e0       	ldi	r20, 0x00	; 0
  bce:	60 e0       	ldi	r22, 0x00	; 0
@@ -2035,21 +2035,21 @@ void ScreenB(void) {
  bd2:	1e dc       	rcall	.-1988   	; 0x410 <BackgroundColor>
 	
 	// Wait for press to go low and then high = 1 press
-	while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) { 
+	while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
  bd4:	02 c0       	rjmp	.+4      	; 0xbda <ScreenB+0xe>
-		while ( !READ(D_IRQ_PINR, D_IRQ_PIN) ) { /* idle */ } 
+		while ( !READ(D_IRQ_PINR, D_IRQ_PIN) ) { /* idle */ }
  bd6:	64 9b       	sbis	0x0c, 4	; 12
  bd8:	fe cf       	rjmp	.-4      	; 0xbd6 <ScreenB+0xa>
 void ScreenB(void) {
-	// Static or idle screen — draw once on entry only
+	// Static or idle screen ? draw once on entry only
 	BackgroundColor(31, 0, 0);  // Red background
 	
 	// Wait for press to go low and then high = 1 press
-	while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) { 
+	while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
  bda:	64 99       	sbic	0x0c, 4	; 12
  bdc:	fc cf       	rjmp	.-8      	; 0xbd6 <ScreenB+0xa>
-		while ( !READ(D_IRQ_PINR, D_IRQ_PIN) ) { /* idle */ } 
-		}
+		while ( !READ(D_IRQ_PINR, D_IRQ_PIN) ) { /* idle */ }
+	}
 
 	
 }
@@ -2105,7 +2105,7 @@ int main(void) {
  c1a:	3b df       	rcall	.-394    	; 0xa92 <ScreenA>
  c1c:	64 99       	sbic	0x0c, 4	; 12
 			case STATE_SCREEN_A:
-			// — Run ScreenA() continuously until we see a touch —
+			// ? Run ScreenA() continuously until we see a touch ?
 			while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
 				// IRQ pin HIGH ? no touch
 				ScreenA();
@@ -2115,7 +2115,7 @@ int main(void) {
 	for (;;) {
 		switch (current_state) {
 			case STATE_SCREEN_A:
-			// — Run ScreenA() continuously until we see a touch —
+			// ? Run ScreenA() continuously until we see a touch ?
 			while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
  c22:	80 e7       	ldi	r24, 0x70	; 112
  c24:	92 e0       	ldi	r25, 0x02	; 2
@@ -2130,7 +2130,7 @@ int main(void) {
  c36:	2f ef       	ldi	r18, 0xFF	; 255
 			}
 
-			// — We just saw IRQ pin LOW ? finger down —
+			// ? We just saw IRQ pin LOW ? finger down ?
 			_delay_ms(50);    // debounce for press
 			// wait for finger lift
 			while ( !READ(D_IRQ_PINR, D_IRQ_PIN) );
@@ -2145,7 +2145,7 @@ int main(void) {
  c48:	81 e0       	ldi	r24, 0x01	; 1
 			_delay_ms(50);    // debounce for release
 
-			// — Toggle to B —
+			// ? Toggle to B ?
 			current_state = STATE_SCREEN_B;
  c4a:	80 93 0d 02 	sts	0x020D, r24	; 0x80020d <current_state>
  c4e:	be df       	rcall	.-132    	; 0xbcc <ScreenB>
@@ -2157,7 +2157,7 @@ int main(void) {
 
 
 			case STATE_SCREEN_B:
-			// — Run ScreenB() continuously until touch —
+			// ? Run ScreenB() continuously until touch ?
 			while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
 				ScreenB();
  c56:	fd cf       	rjmp	.-6      	; 0xc52 <main+0x72>
@@ -2166,7 +2166,7 @@ int main(void) {
 
 
 			case STATE_SCREEN_B:
-			// — Run ScreenB() continuously until touch —
+			// ? Run ScreenB() continuously until touch ?
 			while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
  c5a:	80 e7       	ldi	r24, 0x70	; 112
  c5c:	92 e0       	ldi	r25, 0x02	; 2
@@ -2195,7 +2195,7 @@ int main(void) {
  c80:	10 92 0d 02 	sts	0x020D, r1	; 0x80020d <current_state>
 			_delay_ms(50);
 
-			// — Toggle back to A —
+			// ? Toggle back to A ?
 			current_state = STATE_SCREEN_A;
  c84:	48 dc       	rcall	.-1904   	; 0x516 <InitCoordinate>
  c86:	8f e3       	ldi	r24, 0x3F	; 63

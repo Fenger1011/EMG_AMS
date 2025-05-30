@@ -124,6 +124,27 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Drivers\SD_CARD\diskio.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\ff.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\ff.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\ffconf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\mainforSD.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\SD_Driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Drivers\SD_CARD\SD_Driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Drivers\TFT_Driver\TFT_Driver.c">
       <SubType>compile</SubType>
     </Compile>
@@ -148,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Drivers\" />
+    <Folder Include="Drivers\SD_CARD\" />
     <Folder Include="Drivers\TFT_Driver\" />
     <Folder Include="Drivers\USART_Driver\" />
   </ItemGroup>

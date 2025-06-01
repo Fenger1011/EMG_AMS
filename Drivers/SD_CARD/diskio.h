@@ -1,10 +1,10 @@
 /*-----------------------------------------------------------------------/
-/  Low level disk interface modlue include file   (C)ChaN, 2019          /
+/  Low level disk interface module include file   (C)ChaN, 2019          /
 /-----------------------------------------------------------------------*/
 
 #ifndef _DISKIO_DEFINED
 #define _DISKIO_DEFINED
-#define F_CPU 16000000UL  // Or your actual clock in Hz, e.g., 16000000UL for Mega 2560
+#define F_CPU 16000000UL 
 #include <util/delay.h>
 
 #include "ff.h"

@@ -139,7 +139,9 @@ void ScreenA(void) {
 
 void ScreenB(void) {
 	// Static or idle screen ? draw once on entry only
-	BackgroundColor(31, 0, 0);  // Red background
+	// BackgroundColor(31, 0, 0);  // Red background
+	
+	// ******************************HER SKAL	VÆRE KODE TIL AT GEMME DATA PÅ SD-KORTET**********************************
 	
 	// Wait for press to go low and then high = 1 press
 	while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
@@ -155,7 +157,7 @@ int main(void) {
 	adc_init();
 	pwm_init();
 	DisplayInit();
-	InitTouchInterrupt();    // Still needed if your driver uses it
+	InitTouchInterrupt();	
 	sei();
 	init_pins();
 	CalibrateTouchScreen();

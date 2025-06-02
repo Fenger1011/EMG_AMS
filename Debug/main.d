@@ -16,11 +16,18 @@ main.d main.o: .././main.c \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdlib.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stddef.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
+ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h \
  C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver/USART_Driver.h \
  C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver/TFT_driver.h \
  C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver/XPT2046_Driver.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h \
- c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h
+ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ff.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ffconf.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/diskio.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ff.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/SD_Driver.h \
+ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/diskio.h
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h:
 
@@ -56,6 +63,8 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
 
+c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\string.h:
+
 C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\USART_Driver/USART_Driver.h:
 
 C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\TFT_Driver/TFT_driver.h:
@@ -65,3 +74,15 @@ C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drive
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdio.h:
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdarg.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ff.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ffconf.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/diskio.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/ff.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/SD_Driver.h:
+
+C:\Users\Christian\ Fenger\Documents\Atmel\ Studio\7.0\AMS\EMG_AMS\EMG_AMS\Drivers\SD_CARD/diskio.h:

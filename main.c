@@ -11,7 +11,6 @@
 #include "USART_Driver.h"
 #include "TFT_driver.h"
 #include "XPT2046_Driver.h"
-
 #include "ff.h"
 #include "diskio.h"
 #include "SD_Driver.h"
@@ -39,7 +38,7 @@ uint16_t overThreshold  = 0;
 uint16_t underThreshold = 0;
 char buffer[12];
 
-// Touch flag (comes from your touch driver)
+// Touch flag for when touch triggered
 extern volatile uint8_t touch_triggered;
 
 // Screen states
@@ -53,259 +52,306 @@ ScreenState current_state = STATE_SCREEN_A;
 // Blink flag (set in Timer1 interrupt)
 volatile uint8_t blink_flag = 0;
 
+
 /******************************************************* PWM *************************************************************/
+// Initializes PWM on pin PH5 using Timer4 on Channel C
 void pwm_init(void) {
-	DDRH |= (1 << PH5);
-	TCCR4A = (1 << COM4C1);
-	TCCR4B = (1 << WGM43) | (1 << WGM42)
-	| (1 << CS41) | (1 << CS40);
-	ICR4 = 4999;
+	DDRH |= (1 << PH5);						// Set PH5 as output
+	TCCR4A = (1 << COM4C1);					// Non-inverting mode for Channel C of Timer4
+	TCCR4B = (1 << WGM43) | (1 << WGM42)	// Fast PWM
+	| (1 << CS41) | (1 << CS40);			// Prescaler to 64 => CLk = F_CPU / 64
+	ICR4 = 4999;							// Defines frequency
 }
 
+// Sets PWM duty cycle as a percentage
 void pwm_set_duty(uint16_t duty_percent) {
 	OCR4C = ((uint32_t)ICR4 * duty_percent) / 100;
 }
+/*************************************************************************************************************************/
+
 
 /******************************************************* ADC *************************************************************/
+// Initializes the ADC to read from channel ADC4 with AVcc as the reference
 void adc_init(void) {
-	ADMUX = (1 << REFS0) | (1 << MUX2); // AVcc as ref (5 V), ADC4 (A4)
-	ADCSRA = (1 << ADEN)               // enable ADC
-	| (1 << ADIE)               // enable ADC interrupt
-	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // prescaler=128
-	sei();                             // ensure global interrupts enabled
-	ADCSRA |= (1 << ADSC);             // start first conversion
+	ADMUX = (1 << REFS0) | (1 << MUX2);				// AVcc as reference, ADC4 as input channel
+	ADCSRA = (1 << ADEN)							// Enable ADC
+	| (1 << ADIE)									// Enable ADC interrupt
+	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// Prescaler=128 => f_ADC = 125kHz
+	sei();											// Enable global interrupts
+	ADCSRA |= (1 << ADSC);							// Start first conversion
 }
 
+// ISR triggers when ADC conversion complete
 ISR(ADC_vect) {
-	emg_samples[emg_index++] = ADC;
-	if (emg_index >= BUFFER_SIZE) {
-		emg_index = 0;
-		emg_buffer_full = 1;
+	emg_samples[emg_index++] = ADC;	// Store ADC result in emg sample buffer, increment index
+	if (emg_index >= BUFFER_SIZE) {	// If buffer is full:
+		emg_index = 0;					// Reset index
+		emg_buffer_full = 1;			// Set flag that buffer is full
 	}
-	ADCSRA |= (1 << ADSC); // start next conversion
+	ADCSRA |= (1 << ADSC);			// start next conversion
 }
+/*************************************************************************************************************************/
 
-/************************************************ Timer1: 1 Hz interrupt for blinking *************************************************/
+
+/****************************************************** Timer1 ***********************************************************/
+// Initializes Timer1 to generate 1Hz interrupt
 void timer1_init(void) {
-	// Configure Timer1 in CTC mode (clear on compare match)
-	TCCR1B |= (1 << WGM12);
-	// Set prescaler to 256
-	TCCR1B |= (1 << CS12);
-	// Calculate OCR1A for 1 Hz tick:
-	// 16,000,000 / 256 = 62500 counts per second
-	// OCR1A = 62500 - 1
-	OCR1A = 62499;
-	// Enable Timer1 compare-match interrupt
-	TIMSK1 |= (1 << OCIE1A);
+	TCCR1B |= (1 << WGM12);		// Config Timer1 in CTC mode 
+	TCCR1B |= (1 << CS12);		// Prescaler=256 => (f_CPU / 256)
+	OCR1A = 62499;				// Sets interrupt frequency at 1 Hz [(16MHz / 256) - 1]
+	TIMSK1 |= (1 << OCIE1A);	// Enable Timer1 
 }
 
+// ISR for Timer1
 ISR(TIMER1_COMPA_vect) {
-	blink_flag = 1;
+	blink_flag = 1;				// Sets flag to signal 1 second has passed.
 }
+/*************************************************************************************************************************/
+
 
 /************************************************ RMS Calculation ********************************************************/
+// Calculates the RMS value of samples i buffer
 uint16_t calculate_RMS(void) {
 	uint32_t sum = 0;
+	
+	// 1. Compute mean of all samples										
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		sum += emg_samples[i];
+		sum += emg_samples[i];			// Sum all samples
 	}
-	uint16_t mean = sum / BUFFER_SIZE;
+	uint16_t mean = sum / BUFFER_SIZE;	// Calculate the mean
 
 	uint32_t sum_squares = 0;
+	
+	// 2. Calculate sum of squared deviations from mean
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;
-		sum_squares += (uint32_t)centered * centered;
+		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;	// Center sample around mean
+		sum_squares += (uint32_t)centered * centered;				// Add square of sampled value
 	}
+	
+	// 3. Calculate mean of squared differences
 	uint32_t mean_square = sum_squares / BUFFER_SIZE;
+	
+	// 4. Return the square root of the mean square	(RMS :))
 	return (uint16_t)sqrt((double)mean_square);
 }
+/*************************************************************************************************************************/
+
 
 /************************************************ Motor Control **********************************************************/
+// 'Closes' the servo motor
 void closeHand(void) {
 	pwm_set_duty(6);
 	_delay_ms(500);
 	pwm_set_duty(0);
 }
 
+// 'Opens' the servo motor
 void openHand(void) {
 	pwm_set_duty(9);
 	_delay_ms(475);
 	pwm_set_duty(0);
 }
+/*************************************************************************************************************************/
 
-/************************************************ Helper: generate new filename ******************************************/
-// Scans "EMG000.TXT", "EMG001.TXT", … up to "EMG999.TXT"
-// and returns the first one that does not yet exist.
-// If all 000–999 are taken, returns "EMG999.TXT" as fallback.
+
+/************************************************ Helpers for SD *******************************************************/
+// Generates the correct filename for the EMG data
+// Scans for available filenames in the format "EMG000.TXT" to "EMG999.TXT"
+// Returns the first unused filename in 'filename_out'
+// If all names are taken, defaults to "EMG999.TXT"
 static void get_new_filename(char *filename_out) {
-	FILINFO fno;
+	FILINFO fno;	// File info struct used by FatFs
+	
 	for (uint16_t idx = 0; idx < 1000; idx++) {
-		// Format "EMG000.TXT" … "EMG999.TXT"
-		sprintf(filename_out, "EMG%03u.TXT", idx);
-		if (f_stat(filename_out, &fno) == FR_NO_FILE) {
-			// This one doesn’t exist yet ? use it
-			return;
+		sprintf(filename_out, "EMG%03u.TXT", idx);			// Format index into a filename: "EMG000.TXT", "EMG001.TXT", ..., "EMG999.TXT"
+		if (f_stat(filename_out, &fno) == FR_NO_FILE) {		// Check if file exists on SD card
+			return;											// If file does not exist, use that filename
 		}
 	}
-	// If all 000..999 exist, just use 999:
-	strcpy(filename_out, "EMG999.TXT");
+
+	strcpy(filename_out, "EMG999.TXT");						// If no filename available, use EMG999.txt
 }
 
-/************************************************ Helper: log one RMS line ************************************************/
+
+// Logs a single RMS value (in millivolts) to the open SD file.
 // Must only be called after f_open(&file, ...) has succeeded.
 static void log_rms_to_sd(uint32_t rms_mv) {
-	char line[16];
-	UINT bytes_written;
-	// Format "<number>\n", e.g. "1234\n"
-	uint8_t len = sprintf(line, "%lu\n", rms_mv);
-	f_write(&file, line, len, &bytes_written);
-	// (Optional: verify bytes_written == len / check return code)
+	char line[16];									// Buffer
+	UINT bytes_written;								// Variable to store number of bytes actually written
+	uint8_t len = sprintf(line, "%lu\n", rms_mv);	// Format the RMS value followed by a newline, e.g., "1234\n"
+	f_write(&file, line, len, &bytes_written);		// Write the formatted string to the SD card file
 }
+/*************************************************************************************************************************/
+
 
 /************************************************ Screen A: live EMG visualization ***********************************************/
+// Handles live EMG data processing, visualization, and motor/LED control
 void ScreenA(void) {
 	if (emg_buffer_full) {
-		emg_buffer_full = 0;
+		emg_buffer_full = 0;	// Reset the buffer-full flag	
+		
+		// Calculate RMS from buffer
 		rms_adc = calculate_RMS();
-		// Scale (×4) for display + USART:
+		
+		// Convert RMS to milivolts and scale by 4 (Gives better view on TFT)
 		rms_mv = ((uint32_t)rms_adc * VREF * 4) / 1023;
-		itoa(rms_mv, buffer, 10);
-		USART0_SendString(buffer);
-		USART0_Transmit('\n');
-
+		
+		//*** Send result over UART (FOR DEBUGGING) ***//
+		//itoa(rms_mv, buffer, 10);
+		//USART0_SendString(buffer);
+		//USART0_Transmit('\n');
+		/***********************************************/
+		
+		// Map EMG to screen size
 		uint16_t mapped_sample = ((rms_mv * 239UL) / 2000);
+		
+		// Draw EMG on screen at current x
 		DrawEMG(mapped_sample, x);
+		
+		// Move x for scrolling effect
 		x -= 3;
+		
+		// If x at end, reset to start of screen						
 		if (x <= 1) {
-			x = 319;
-			InitCoordinate();
+			x = 319;			
+			InitCoordinate();	// Resets the screen
 		}
-
+		
+		// If RMS over threshold
 		if (rms_mv >= threshold) {
-			overThreshold++;
-			if (overThreshold == 3) {
-				PORTB |= (1 << PB7);  // LED on
-				closeHand();
-				underThreshold = 0;
+			overThreshold++;			// Increment over threshold counter (helps smoothing)
+			if (overThreshold == 3) {	// If over threshold for three increments
+				//PORTB |= (1 << PB7);	// LED on (FOR DEBUGGING)
+				closeHand();			// Close the prosthesis (servo motor)
+				underThreshold = 0;		// Reset counter
 			}
 		}
+		
+		// If RMS under threshold
 		if (rms_mv <= threshold) {
-			underThreshold++;
-			if (underThreshold == 5) {
-				PORTB &= ~(1 << PB7); // LED off
-				openHand();
-				overThreshold = 0;
+			underThreshold++;			// Increment under threshold counter (helps smoothing)
+			if (underThreshold == 5) {	// If over threshold for five increments (Stops the motor from flickering)
+				//PORTB &= ~(1 << PB7);	// LED off (FOR DEBUGGING)
+				openHand();				// Open the prosthesis (servo motor)
+				overThreshold = 0;		// Reset counter
 			}
 		}
 	}
 }
+/*************************************************************************************************************************/
+
 
 /************************************************ Screen B: log EMG to SD & blink background ***********************************/
+// Logs EMG data and blinks screen
 void ScreenB(void) {
-	static uint8_t blink_state = 0;
+	static uint8_t blink_state = 0;	// Keeps track of blinking
 
 	// Toggle background color when blink_flag is set (once per second)
 	if (blink_flag) {
-		blink_flag = 0;
-		blink_state = !blink_state;
+		blink_flag = 0;				// Reset flag
+		blink_state = !blink_state;	// Flip the state
+		
 		if (blink_state) {
-			// White background (RGB565 max)
-			BackgroundColor(31, 63, 31);
+			BackgroundColor(31, 63, 31);	// Set background to white
 			} else {
-			// Black background
-			BackgroundColor(0, 0, 0);
+			BackgroundColor(0, 0, 0);		// Set background to black
 		}
 	}
 
+	// If a new EMG buffer is full (from ISR)
 	if (emg_buffer_full) {
-		emg_buffer_full = 0;
-		rms_adc = calculate_RMS();
-		rms_mv = ((uint32_t)rms_adc * VREF * 4) / 1023;
-		log_rms_to_sd(rms_mv);
+		emg_buffer_full = 0;							// Reset flag
+		rms_adc = calculate_RMS();						// Calculate RMS
+		rms_mv = ((uint32_t)rms_adc * VREF * 4) / 1023;	// Convert RMS to militvolts 
+		log_rms_to_sd(rms_mv);							// Log mV_RMS to SD card
 	}
 }
+/*************************************************************************************************************************/
+
 
 /*********************************************** Main *******************************************************************/
 int main(void) {
-	// Initialize UART, ADC, PWM, Display, Touch, Pins
-	USART0_Init(MYUBRR);
-	adc_init();
-	pwm_init();
-	DisplayInit();
-	InitTouchInterrupt();
-	init_pins();
-	CalibrateTouchScreen();
-	DDRB |= (1 << PB7);  // Debug LED pin
+	// Initialize peripherals
+	//USART0_Init(MYUBRR);		// Initialize UART (FOR DEBUGGING)	
+	adc_init();					// Initialize ADC
+	pwm_init();					// Initialize PWM
+	DisplayInit();				// Initialize TFT display
+	InitTouchInterrupt();		// Initialize TFT touch screen
+	init_pins();				// Initialize custom pins for bitbanged SPI (for XPT)
+	CalibrateTouchScreen();		// Run calibrate touch screen as the first in loop -> Makes sure all future touch inputs are correct.
+	//DDRB |= (1 << PB7);		// LED pin (FOR DEBUGGING)
 
-	// Enable interrupts and start Timer1
-	sei();
-	timer1_init();
+	sei();							// Enable global timer interrupts
+	timer1_init();					// Start Timer1 for 1 Hz interrupts (for screenB)
 
-	current_state = STATE_SCREEN_A;
-	x = 319;
+	current_state = STATE_SCREEN_A;	// Start in screen A (EMG visualisation)
+	x = 319;						// Set initial X coordinate for plotting
 
-	// Draw Screen A axes once at startup
-	InitCoordinate();
+	InitCoordinate();				// Draw Screen A axes once at startup
 
 	for (;;) {
 		switch (current_state) {
 
 			case STATE_SCREEN_A:
-			// Run ScreenA() until a touch is detected
+			// Continuously run Screen A (live view) until a touch is detected
 			while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
 				ScreenA();
 			}
-			// Finger-down ? debounce + wait for lift
+			
+			// Touch detected: debounce + wait for lift
 			_delay_ms(50);
 			while ( !READ(D_IRQ_PINR, D_IRQ_PIN) );
 			_delay_ms(50);
 
-			// Switch to Screen B
+			// Switch to Screen B (logging mode)
 			current_state = STATE_SCREEN_B;
+			
 			// Ensure ScreenB background is set on first call
 			{
-				extern void ScreenB(void);
-				// If "drawn_bg" logic existed, reset it here. In this version, Timer1 ISR will handle blinking.
+				extern void ScreenB(void);	// Inform compiler ScreenB exists
+				// Could reset any screen-specific state here if needed
 			}
-			// Initialize Screen B background immediately
+			
+			// Initialize Screen B background immediately to black
 			BackgroundColor(0, 0, 0);
 			break;
 
 			case STATE_SCREEN_B: {
-				// Mount SD card
+				// Try to mount the SD card file system
 				if (f_mount(&fs, "", 1) != FR_OK) {
-					// Mount failed ? hang
+					// Mount failed: enter infinite loop (system halt)
 					while (1) { }
 				}
 
-				// Generate new filename like "EMG000.TXT"
+				// Generate new filename like "EMG000.TXT" from helper function
 				char fname[16];
 				get_new_filename(fname);
 
-				// Open/create the file for writing
+				// Try to open/create the file for writing (overwrite if it exists)
 				if (f_open(&file, fname, FA_WRITE | FA_CREATE_ALWAYS) != FR_OK) {
-					// Open failed ? hang
+					// File open failed: halt
 					while (1) { }
 				}
 
-				// Continuously log data and blink until next touch
+				// Run Screen B logic (logging + background blinking) until touch
 				while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
 					ScreenB();
 				}
 
-				// Touch detected ? close file, then go back to Screen A
+				// Touch detected: close file and return to Screen A
 				f_close(&file);
-
+				
+				// Debounce touch
 				_delay_ms(50);
 				while ( !READ(D_IRQ_PINR, D_IRQ_PIN) );
 				_delay_ms(50);
-
-				// Return to Screen A
+				
+				// Reinitialize for Screen A view
 				current_state = STATE_SCREEN_A;
-				InitCoordinate();
-				x = 319;
-				overThreshold  = 0;
-				underThreshold = 0;
+				InitCoordinate();		// Redraw axis
+				x = 319;				// Reset x position for plotting
+				overThreshold  = 0;		// Reset flag
+				underThreshold = 0;		// Reset flag
 				break;
 			}
 		}

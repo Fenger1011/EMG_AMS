@@ -7325,11 +7325,11 @@ void USART0_SendString(const char *str) {
     3320:	08 95       	ret
 
 00003322 <log_rms_to_sd>:
-	strcpy(filename_out, "EMG999.TXT");
 }
 
-/************************************************ Helper: log one RMS line ************************************************/
+
 // Must only be called after f_open(&file, ...) has succeeded.
+// Logs a single RMS value (in millivolts) to the open SD file.
 static void log_rms_to_sd(uint32_t rms_mv) {
     3322:	0f 93       	push	r16
     3324:	1f 93       	push	r17
@@ -7343,10 +7343,9 @@ static void log_rms_to_sd(uint32_t rms_mv) {
     3334:	de bf       	out	0x3e, r29	; 62
     3336:	0f be       	out	0x3f, r0	; 63
     3338:	cd bf       	out	0x3d, r28	; 61
-	char line[16];
-	UINT bytes_written;
-	// Format "<number>\n", e.g. "1234\n"
-	uint8_t len = sprintf(line, "%lu\n", rms_mv);
+	char line[16];									// Buffer
+	UINT bytes_written;								// Variable to store number of bytes actually written
+	uint8_t len = sprintf(line, "%lu\n", rms_mv);	// Format the RMS value followed by a newline, e.g., "1234\n"
     333a:	9f 93       	push	r25
     333c:	8f 93       	push	r24
     333e:	7f 93       	push	r23
@@ -7361,7 +7360,7 @@ static void log_rms_to_sd(uint32_t rms_mv) {
     3350:	1f 93       	push	r17
     3352:	0f 93       	push	r16
     3354:	24 d4       	rcall	.+2120   	; 0x3b9e <sprintf>
-	f_write(&file, line, len, &bytes_written);
+	f_write(&file, line, len, &bytes_written);		// Write the formatted string to the SD card file
     3356:	ac 01       	movw	r20, r24
     3358:	55 27       	eor	r21, r21
     335a:	9e 01       	movw	r18, r28
@@ -7371,7 +7370,6 @@ static void log_rms_to_sd(uint32_t rms_mv) {
     3362:	86 e4       	ldi	r24, 0x46	; 70
     3364:	98 e0       	ldi	r25, 0x08	; 8
     3366:	0e 94 df 10 	call	0x21be	; 0x21be <f_write>
-	// (Optional: verify bytes_written == len / check return code)
 }
     336a:	0f b6       	in	r0, 0x3f	; 63
     336c:	f8 94       	cli
@@ -7391,11 +7389,11 @@ static void log_rms_to_sd(uint32_t rms_mv) {
     3388:	08 95       	ret
 
 0000338a <get_new_filename>:
-
-/************************************************ Helper: generate new filename ******************************************/
-// Scans "EMG000.TXT", "EMG001.TXT", … up to "EMG999.TXT"
-// and returns the first one that does not yet exist.
-// If all 000–999 are taken, returns "EMG999.TXT" as fallback.
+/************************************************ Helpers for SD *******************************************************/
+// Generates the correct filename for the EMG data
+// Scans for available filenames in the format "EMG000.TXT" to "EMG999.TXT"
+// Returns the first unused filename in 'filename_out'
+// If all names are taken, defaults to "EMG999.TXT"
 static void get_new_filename(char *filename_out) {
     338a:	ef 92       	push	r14
     338c:	ff 92       	push	r15
@@ -7413,13 +7411,13 @@ static void get_new_filename(char *filename_out) {
     33a4:	cd bf       	out	0x3d, r28	; 61
     33a6:	e8 2e       	mov	r14, r24
     33a8:	f9 2e       	mov	r15, r25
-	FILINFO fno;
+	FILINFO fno;	// File info struct used by FatFs
+	
 	for (uint16_t idx = 0; idx < 1000; idx++) {
     33aa:	00 e0       	ldi	r16, 0x00	; 0
     33ac:	10 e0       	ldi	r17, 0x00	; 0
     33ae:	19 c0       	rjmp	.+50     	; 0x33e2 <get_new_filename+0x58>
-		// Format "EMG000.TXT" … "EMG999.TXT"
-		sprintf(filename_out, "EMG%03u.TXT", idx);
+		sprintf(filename_out, "EMG%03u.TXT", idx);			// Format index into a filename: "EMG000.TXT", "EMG001.TXT", ..., "EMG999.TXT"
     33b0:	1f 93       	push	r17
     33b2:	0f 93       	push	r16
     33b4:	82 e2       	ldi	r24, 0x22	; 34
@@ -7429,7 +7427,7 @@ static void get_new_filename(char *filename_out) {
     33bc:	ff 92       	push	r15
     33be:	ef 92       	push	r14
     33c0:	ee d3       	rcall	.+2012   	; 0x3b9e <sprintf>
-		if (f_stat(filename_out, &fno) == FR_NO_FILE) {
+		if (f_stat(filename_out, &fno) == FR_NO_FILE) {		// Check if file exists on SD card
     33c2:	be 01       	movw	r22, r28
     33c4:	6f 5f       	subi	r22, 0xFF	; 255
     33c6:	7f 4f       	sbci	r23, 0xFF	; 255
@@ -7444,11 +7442,11 @@ static void get_new_filename(char *filename_out) {
     33d8:	0f 90       	pop	r0
     33da:	84 30       	cpi	r24, 0x04	; 4
     33dc:	79 f0       	breq	.+30     	; 0x33fc <get_new_filename+0x72>
-// Scans "EMG000.TXT", "EMG001.TXT", … up to "EMG999.TXT"
-// and returns the first one that does not yet exist.
-// If all 000–999 are taken, returns "EMG999.TXT" as fallback.
+// Returns the first unused filename in 'filename_out'
+// If all names are taken, defaults to "EMG999.TXT"
 static void get_new_filename(char *filename_out) {
-	FILINFO fno;
+	FILINFO fno;	// File info struct used by FatFs
+	
 	for (uint16_t idx = 0; idx < 1000; idx++) {
     33de:	0f 5f       	subi	r16, 0xFF	; 255
     33e0:	1f 4f       	sbci	r17, 0xFF	; 255
@@ -7456,12 +7454,12 @@ static void get_new_filename(char *filename_out) {
     33e4:	83 e0       	ldi	r24, 0x03	; 3
     33e6:	18 07       	cpc	r17, r24
     33e8:	18 f3       	brcs	.-58     	; 0x33b0 <get_new_filename+0x26>
-			// This one doesn’t exist yet ? use it
-			return;
+		if (f_stat(filename_out, &fno) == FR_NO_FILE) {		// Check if file exists on SD card
+			return;											// If file does not exist, use that filename
 		}
 	}
-	// If all 000..999 exist, just use 999:
-	strcpy(filename_out, "EMG999.TXT");
+
+	strcpy(filename_out, "EMG999.TXT");						// If no filename available, use EMG999.txt
     33ea:	8b e0       	ldi	r24, 0x0B	; 11
     33ec:	ee e2       	ldi	r30, 0x2E	; 46
     33ee:	f2 e0       	ldi	r31, 0x02	; 2
@@ -7487,25 +7485,25 @@ static void get_new_filename(char *filename_out) {
     3414:	08 95       	ret
 
 00003416 <pwm_init>:
-// Blink flag (set in Timer1 interrupt)
-volatile uint8_t blink_flag = 0;
+
 
 /******************************************************* PWM *************************************************************/
+// Initializes PWM on pin PH5 using Timer4 on Channel C
 void pwm_init(void) {
-	DDRH |= (1 << PH5);
+	DDRH |= (1 << PH5);						// Set PH5 as output
     3416:	e1 e0       	ldi	r30, 0x01	; 1
     3418:	f1 e0       	ldi	r31, 0x01	; 1
     341a:	80 81       	ld	r24, Z
     341c:	80 62       	ori	r24, 0x20	; 32
     341e:	80 83       	st	Z, r24
-	TCCR4A = (1 << COM4C1);
+	TCCR4A = (1 << COM4C1);					// Non-inverting mode for Channel C of Timer4
     3420:	88 e0       	ldi	r24, 0x08	; 8
     3422:	80 93 a0 00 	sts	0x00A0, r24	; 0x8000a0 <__TEXT_REGION_LENGTH__+0x7c00a0>
-	TCCR4B = (1 << WGM43) | (1 << WGM42)
+	TCCR4B = (1 << WGM43) | (1 << WGM42)	// Fast PWM
     3426:	8b e1       	ldi	r24, 0x1B	; 27
     3428:	80 93 a1 00 	sts	0x00A1, r24	; 0x8000a1 <__TEXT_REGION_LENGTH__+0x7c00a1>
-	| (1 << CS41) | (1 << CS40);
-	ICR4 = 4999;
+	| (1 << CS41) | (1 << CS40);			// Prescaler to 64 => CLk = F_CPU / 64
+	ICR4 = 4999;							// Defines frequency
     342c:	87 e8       	ldi	r24, 0x87	; 135
     342e:	93 e1       	ldi	r25, 0x13	; 19
     3430:	90 93 a7 00 	sts	0x00A7, r25	; 0x8000a7 <__TEXT_REGION_LENGTH__+0x7c00a7>
@@ -7515,6 +7513,7 @@ void pwm_init(void) {
 0000343a <pwm_set_duty>:
 }
 
+// Sets PWM duty cycle as a percentage
 void pwm_set_duty(uint16_t duty_percent) {
 	OCR4C = ((uint32_t)ICR4 * duty_percent) / 100;
     343a:	20 91 a6 00 	lds	r18, 0x00A6	; 0x8000a6 <__TEXT_REGION_LENGTH__+0x7c00a6>
@@ -7531,23 +7530,24 @@ void pwm_set_duty(uint16_t duty_percent) {
     3458:	08 95       	ret
 
 0000345a <adc_init>:
-}
+
 
 /******************************************************* ADC *************************************************************/
+// Initializes the ADC to read from channel ADC4 with AVcc as the reference
 void adc_init(void) {
-	ADMUX = (1 << REFS0) | (1 << MUX2); // AVcc as ref (5 V), ADC4 (A4)
+	ADMUX = (1 << REFS0) | (1 << MUX2);				// AVcc as reference, ADC4 as input channel
     345a:	84 e4       	ldi	r24, 0x44	; 68
     345c:	80 93 7c 00 	sts	0x007C, r24	; 0x80007c <__TEXT_REGION_LENGTH__+0x7c007c>
-	ADCSRA = (1 << ADEN)               // enable ADC
+	ADCSRA = (1 << ADEN)							// Enable ADC
     3460:	ea e7       	ldi	r30, 0x7A	; 122
     3462:	f0 e0       	ldi	r31, 0x00	; 0
     3464:	8f e8       	ldi	r24, 0x8F	; 143
     3466:	80 83       	st	Z, r24
-	| (1 << ADIE)               // enable ADC interrupt
-	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // prescaler=128
-	sei();                             // ensure global interrupts enabled
+	| (1 << ADIE)									// Enable ADC interrupt
+	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// Prescaler=128 => f_ADC = 125kHz
+	sei();											// Enable global interrupts
     3468:	78 94       	sei
-	ADCSRA |= (1 << ADSC);             // start first conversion
+	ADCSRA |= (1 << ADSC);							// Start first conversion
     346a:	80 81       	ld	r24, Z
     346c:	80 64       	ori	r24, 0x40	; 64
     346e:	80 83       	st	Z, r24
@@ -7556,6 +7556,7 @@ void adc_init(void) {
 00003472 <__vector_29>:
 }
 
+// ISR triggers when ADC conversion complete
 ISR(ADC_vect) {
     3472:	1f 92       	push	r1
     3474:	0f 92       	push	r0
@@ -7570,7 +7571,7 @@ ISR(ADC_vect) {
     3486:	9f 93       	push	r25
     3488:	ef 93       	push	r30
     348a:	ff 93       	push	r31
-	emg_samples[emg_index++] = ADC;
+	emg_samples[emg_index++] = ADC;	// Store ADC result in emg sample buffer, increment index
     348c:	80 91 55 02 	lds	r24, 0x0255	; 0x800255 <emg_index>
     3490:	90 91 56 02 	lds	r25, 0x0256	; 0x800256 <emg_index+0x1>
     3494:	9c 01       	movw	r18, r24
@@ -7587,20 +7588,20 @@ ISR(ADC_vect) {
     34b2:	fb 4f       	sbci	r31, 0xFB	; 251
     34b4:	31 83       	std	Z+1, r19	; 0x01
     34b6:	20 83       	st	Z, r18
-	if (emg_index >= BUFFER_SIZE) {
+	if (emg_index >= BUFFER_SIZE) {	// If buffer is full:
     34b8:	80 91 55 02 	lds	r24, 0x0255	; 0x800255 <emg_index>
     34bc:	90 91 56 02 	lds	r25, 0x0256	; 0x800256 <emg_index+0x1>
     34c0:	80 3e       	cpi	r24, 0xE0	; 224
     34c2:	91 40       	sbci	r25, 0x01	; 1
     34c4:	38 f0       	brcs	.+14     	; 0x34d4 <__vector_29+0x62>
-		emg_index = 0;
+		emg_index = 0;					// Reset index
     34c6:	10 92 56 02 	sts	0x0256, r1	; 0x800256 <emg_index+0x1>
     34ca:	10 92 55 02 	sts	0x0255, r1	; 0x800255 <emg_index>
-		emg_buffer_full = 1;
+		emg_buffer_full = 1;			// Set flag that buffer is full
     34ce:	81 e0       	ldi	r24, 0x01	; 1
     34d0:	80 93 54 02 	sts	0x0254, r24	; 0x800254 <emg_buffer_full>
 	}
-	ADCSRA |= (1 << ADSC); // start next conversion
+	ADCSRA |= (1 << ADSC);			// start next conversion
     34d4:	ea e7       	ldi	r30, 0x7A	; 122
     34d6:	f0 e0       	ldi	r31, 0x00	; 0
     34d8:	80 81       	ld	r24, Z
@@ -7623,30 +7624,26 @@ ISR(ADC_vect) {
 
 000034f8 <timer1_init>:
 
-/************************************************ Timer1: 1 Hz interrupt for blinking *************************************************/
+
+/****************************************************** Timer1 ***********************************************************/
+// Initializes Timer1 to generate 1Hz interrupt
 void timer1_init(void) {
-	// Configure Timer1 in CTC mode (clear on compare match)
-	TCCR1B |= (1 << WGM12);
+	TCCR1B |= (1 << WGM12);		// Config Timer1 in CTC mode 
     34f8:	e1 e8       	ldi	r30, 0x81	; 129
     34fa:	f0 e0       	ldi	r31, 0x00	; 0
     34fc:	80 81       	ld	r24, Z
     34fe:	88 60       	ori	r24, 0x08	; 8
     3500:	80 83       	st	Z, r24
-	// Set prescaler to 256
-	TCCR1B |= (1 << CS12);
+	TCCR1B |= (1 << CS12);		// Prescaler=256 => (f_CPU / 256)
     3502:	80 81       	ld	r24, Z
     3504:	84 60       	ori	r24, 0x04	; 4
     3506:	80 83       	st	Z, r24
-	// Calculate OCR1A for 1 Hz tick:
-	// 16,000,000 / 256 = 62500 counts per second
-	// OCR1A = 62500 - 1
-	OCR1A = 62499;
+	OCR1A = 62499;				// Sets interrupt frequency at 1 Hz [(16MHz / 256) - 1]
     3508:	83 e2       	ldi	r24, 0x23	; 35
     350a:	94 ef       	ldi	r25, 0xF4	; 244
     350c:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7c0089>
     3510:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7c0088>
-	// Enable Timer1 compare-match interrupt
-	TIMSK1 |= (1 << OCIE1A);
+	TIMSK1 |= (1 << OCIE1A);	// Enable Timer1 
     3514:	ef e6       	ldi	r30, 0x6F	; 111
     3516:	f0 e0       	ldi	r31, 0x00	; 0
     3518:	80 81       	ld	r24, Z
@@ -7657,6 +7654,7 @@ void timer1_init(void) {
 00003520 <__vector_17>:
 }
 
+// ISR for Timer1
 ISR(TIMER1_COMPA_vect) {
     3520:	1f 92       	push	r1
     3522:	0f 92       	push	r0
@@ -7664,7 +7662,7 @@ ISR(TIMER1_COMPA_vect) {
     3526:	0f 92       	push	r0
     3528:	11 24       	eor	r1, r1
     352a:	8f 93       	push	r24
-	blink_flag = 1;
+	blink_flag = 1;				// Sets flag to signal 1 second has passed.
     352c:	81 e0       	ldi	r24, 0x01	; 1
     352e:	80 93 48 02 	sts	0x0248, r24	; 0x800248 <blink_flag>
 }
@@ -7677,7 +7675,9 @@ ISR(TIMER1_COMPA_vect) {
 
 0000353e <calculate_RMS>:
 
+
 /************************************************ RMS Calculation ********************************************************/
+// Calculates the RMS value of samples i buffer
 uint16_t calculate_RMS(void) {
     353e:	8f 92       	push	r8
     3540:	9f 92       	push	r9
@@ -7688,21 +7688,25 @@ uint16_t calculate_RMS(void) {
     354a:	ef 92       	push	r14
     354c:	ff 92       	push	r15
 	uint32_t sum = 0;
+	
+	// 1. Compute mean of all samples										
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     354e:	80 e0       	ldi	r24, 0x00	; 0
     3550:	90 e0       	ldi	r25, 0x00	; 0
-	blink_flag = 1;
-}
+
 
 /************************************************ RMS Calculation ********************************************************/
+// Calculates the RMS value of samples i buffer
 uint16_t calculate_RMS(void) {
 	uint32_t sum = 0;
     3552:	40 e0       	ldi	r20, 0x00	; 0
     3554:	50 e0       	ldi	r21, 0x00	; 0
     3556:	ba 01       	movw	r22, r20
+	
+	// 1. Compute mean of all samples										
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     3558:	0c c0       	rjmp	.+24     	; 0x3572 <calculate_RMS+0x34>
-		sum += emg_samples[i];
+		sum += emg_samples[i];			// Sum all samples
     355a:	fc 01       	movw	r30, r24
     355c:	ee 0f       	add	r30, r30
     355e:	ff 1f       	adc	r31, r31
@@ -7714,20 +7718,20 @@ uint16_t calculate_RMS(void) {
     356a:	53 1f       	adc	r21, r19
     356c:	61 1d       	adc	r22, r1
     356e:	71 1d       	adc	r23, r1
-}
-
-/************************************************ RMS Calculation ********************************************************/
+// Calculates the RMS value of samples i buffer
 uint16_t calculate_RMS(void) {
 	uint32_t sum = 0;
+	
+	// 1. Compute mean of all samples										
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     3570:	01 96       	adiw	r24, 0x01	; 1
     3572:	80 3e       	cpi	r24, 0xE0	; 224
     3574:	21 e0       	ldi	r18, 0x01	; 1
     3576:	92 07       	cpc	r25, r18
     3578:	80 f3       	brcs	.-32     	; 0x355a <calculate_RMS+0x1c>
-		sum += emg_samples[i];
+		sum += emg_samples[i];			// Sum all samples
 	}
-	uint16_t mean = sum / BUFFER_SIZE;
+	uint16_t mean = sum / BUFFER_SIZE;	// Calculate the mean
     357a:	cb 01       	movw	r24, r22
     357c:	ba 01       	movw	r22, r20
     357e:	20 ee       	ldi	r18, 0xE0	; 224
@@ -7739,21 +7743,25 @@ uint16_t calculate_RMS(void) {
     358a:	5a 01       	movw	r10, r20
 
 	uint32_t sum_squares = 0;
+	
+	// 2. Calculate sum of squared deviations from mean
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     358c:	40 e0       	ldi	r20, 0x00	; 0
     358e:	50 e0       	ldi	r21, 0x00	; 0
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		sum += emg_samples[i];
+		sum += emg_samples[i];			// Sum all samples
 	}
-	uint16_t mean = sum / BUFFER_SIZE;
+	uint16_t mean = sum / BUFFER_SIZE;	// Calculate the mean
 
 	uint32_t sum_squares = 0;
     3590:	c1 2c       	mov	r12, r1
     3592:	d1 2c       	mov	r13, r1
     3594:	76 01       	movw	r14, r12
+	
+	// 2. Calculate sum of squared deviations from mean
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     3596:	11 c0       	rjmp	.+34     	; 0x35ba <calculate_RMS+0x7c>
-		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;
+		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;	// Center sample around mean
     3598:	fa 01       	movw	r30, r20
     359a:	ee 0f       	add	r30, r30
     359c:	ff 1f       	adc	r31, r31
@@ -7763,18 +7771,18 @@ uint16_t calculate_RMS(void) {
     35a4:	b1 81       	ldd	r27, Z+1	; 0x01
     35a6:	a8 19       	sub	r26, r8
     35a8:	b9 09       	sbc	r27, r9
-		sum_squares += (uint32_t)centered * centered;
+		sum_squares += (uint32_t)centered * centered;				// Add square of sampled value
     35aa:	9d 01       	movw	r18, r26
     35ac:	b0 d2       	rcall	.+1376   	; 0x3b0e <__mulhisi3>
     35ae:	c6 0e       	add	r12, r22
     35b0:	d7 1e       	adc	r13, r23
     35b2:	e8 1e       	adc	r14, r24
     35b4:	f9 1e       	adc	r15, r25
-		sum += emg_samples[i];
-	}
-	uint16_t mean = sum / BUFFER_SIZE;
+	uint16_t mean = sum / BUFFER_SIZE;	// Calculate the mean
 
 	uint32_t sum_squares = 0;
+	
+	// 2. Calculate sum of squared deviations from mean
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
     35b6:	4f 5f       	subi	r20, 0xFF	; 255
     35b8:	5f 4f       	sbci	r21, 0xFF	; 255
@@ -7782,9 +7790,11 @@ uint16_t calculate_RMS(void) {
     35bc:	81 e0       	ldi	r24, 0x01	; 1
     35be:	58 07       	cpc	r21, r24
     35c0:	58 f3       	brcs	.-42     	; 0x3598 <calculate_RMS+0x5a>
-		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;
-		sum_squares += (uint32_t)centered * centered;
+		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;	// Center sample around mean
+		sum_squares += (uint32_t)centered * centered;				// Add square of sampled value
 	}
+	
+	// 3. Calculate mean of squared differences
 	uint32_t mean_square = sum_squares / BUFFER_SIZE;
     35c2:	c7 01       	movw	r24, r14
     35c4:	b6 01       	movw	r22, r12
@@ -7795,6 +7805,8 @@ uint16_t calculate_RMS(void) {
     35ce:	7d d2       	rcall	.+1274   	; 0x3aca <__udivmodsi4>
     35d0:	69 01       	movw	r12, r18
     35d2:	7a 01       	movw	r14, r20
+	
+	// 4. Return the square root of the mean square	(RMS :))
 	return (uint16_t)sqrt((double)mean_square);
     35d4:	c7 01       	movw	r24, r14
     35d6:	b6 01       	movw	r22, r12
@@ -7816,7 +7828,9 @@ uint16_t calculate_RMS(void) {
 000035f2 <closeHand>:
     35f2:	86 e0       	ldi	r24, 0x06	; 6
 
+
 /************************************************ Motor Control **********************************************************/
+// 'Closes' the servo motor
 void closeHand(void) {
 	pwm_set_duty(6);
     35f4:	90 e0       	ldi	r25, 0x00	; 0
@@ -7840,6 +7854,7 @@ void closeHand(void) {
 00003612 <openHand>:
 }
 
+// 'Opens' the servo motor
 void openHand(void) {
 	pwm_set_duty(9);
     3612:	89 e0       	ldi	r24, 0x09	; 9
@@ -7862,7 +7877,7 @@ void openHand(void) {
     3630:	08 95       	ret
 
 00003632 <ScreenA>:
-	// (Optional: verify bytes_written == len / check return code)
+	f_write(&file, line, len, &bytes_written);		// Write the formatted string to the SD card file
 }
 
 /************************************************ Screen A: live EMG visualization ***********************************************/

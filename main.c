@@ -33,7 +33,7 @@ volatile uint8_t  emg_buffer_full = 0;
 uint16_t x            = 319;
 uint16_t rms_adc      = 0;
 uint32_t rms_mv       = 0;
-uint16_t threshold    = 200;
+uint16_t threshold    = 100;
 uint16_t overThreshold  = 0;
 uint16_t underThreshold = 0;
 char buffer[12];
@@ -56,12 +56,15 @@ volatile uint8_t blink_flag = 0;
 /******************************************************* PWM *************************************************************/
 // Initializes PWM on pin PH5 using Timer4 on Channel C
 void pwm_init(void) {
-	DDRH |= (1 << PH5);						// Set PH5 as output
-	TCCR4A = (1 << COM4C1);					// Non-inverting mode for Channel C of Timer4
-	TCCR4B = (1 << WGM43) | (1 << WGM42)	// Fast PWM
-	| (1 << CS41) | (1 << CS40);			// Prescaler to 64 => CLk = F_CPU / 64
-	ICR4 = 4999;							// Defines frequency
+	DDRH |= (1 << PH5); // PH5 as output (OC4C)
+	
+	TCCR4A = (1 << COM4C1) | (1 << WGM41);  // Non-inverting, Fast PWM (part 1)
+	TCCR4B = (1 << WGM43) | (1 << WGM42)    // Fast PWM mode 14, ICR4 = TOP
+	| (1 << CS41) | (1 << CS40);     // Prescaler = 64 (16MHz / 64 = 250 kHz)
+	
+	ICR4 = 4999; // 20ms period (50Hz): (16e6 / 64) / 50Hz = 5000 ? -1 = 4999
 }
+
 
 // Sets PWM duty cycle as a percentage
 void pwm_set_duty(uint16_t duty_percent) {

@@ -1,56 +1,57 @@
-#define F_CPU 16000000UL
+#define F_CPU 16000000UL	// CPU frequency
 
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdint.h>
-#include <avr/interrupt.h>
-#include <string.h>
+#include <avr/io.h>			// AVR I/O Header
+#include <util/delay.h>		// Delays
+#include <stdlib.h>			// For using itoa (int to ASCII conversion)
+#include <math.h>			// For using sqrt()
+#include <stdint.h>			// For fixed-width int types (uint16_t etc.)
+#include <avr/interrupt.h>	// ISR() and sei()
+#include <string.h>			// string manipulation
 
-#include "USART_Driver.h"
-#include "TFT_driver.h"
-#include "XPT2046_Driver.h"
-#include "ff.h"
-#include "diskio.h"
-#include "SD_Driver.h"
+#include "USART_Driver.h"	// USART_Driver for debugging
+#include "TFT_driver.h"		// TFT driver 
+#include "XPT2046_Driver.h"	// XPT2046 Driver
+#include "ff.h"				// FatFS library header (used to read/write to SD cards f_open(), f_write(), f_close())
+#include "diskio.h"			// disk I/O used by FatFS (connects FatFS engine to SD driver)
+#include "SD_Driver.h"		// SD card driver
 
 FATFS fs;
 FIL file;
 UINT bw;
 
-#define BAUD         9600
-#define MYUBRR       (F_CPU/16/BAUD - 1)
-#define VREF         5000
-#define BUFFER_SIZE  480
+#define BAUD         9600				// Baud rate for UART
+#define MYUBRR       (F_CPU/16/BAUD - 1)// Calculates baud rate for UART for baud rate register 
+
+#define VREF         5000				// ADC reference voltage
+#define BUFFER_SIZE  480				// EMG sample buffer size per processing window
 
 // EMG buffer and flags
-volatile uint16_t emg_samples[BUFFER_SIZE];
-volatile uint16_t emg_index       = 0;
-volatile uint8_t  emg_buffer_full = 0;
+volatile uint16_t emg_samples[BUFFER_SIZE];	// EMG sample buffer of size BUFFER_SIZE = 480 (volatile because ISR updates this buffer)
+volatile uint16_t emg_index       = 0;		// For knowing index in emg_samples[] array
+volatile uint8_t  emg_buffer_full = 0;		// Flag for when buffer is full and ready for processing / saving to SD etc.
+volatile uint8_t blink_flag = 0;			// Blink flag (set in Timer1 interrupt)
+extern volatile uint8_t touch_triggered;	// Touch flag for when touch triggered (defined in XPT2046_driver.c --> therefore extern volatile)
 
 // EMG processing variables
-uint16_t x            = 319;
-uint16_t rms_adc      = 0;
-uint32_t rms_mv       = 0;
-uint16_t threshold    = 100;
-uint16_t overThreshold  = 0;
-uint16_t underThreshold = 0;
-char buffer[12];
+uint16_t x            = 319;	// The leftmost position on the horizontal position on the TFT
+uint16_t rms_adc      = 0;		// holds RMS value of EMG from ADC
+uint32_t rms_mv       = 0;		// Holds RMS value in mV
+uint16_t threshold    = 100;	// EMG signal activation threshold for motor control
+uint16_t overThreshold  = 0;	// Counter for consecutive 'windows' where the EMG signals are over threshold
+uint16_t underThreshold = 0;	// Counter for consecutive 'windows' where the EMG signals are under threshold
+char buffer[12];				// Used for converting numerical values into string for UART
 
-// Touch flag for when touch triggered
-extern volatile uint8_t touch_triggered;
 
 // Screen states
 typedef enum {
-	STATE_SCREEN_A,
-	STATE_SCREEN_B
+	STATE_SCREEN_A,	// Live EMG visualization and motor control screen
+	STATE_SCREEN_B	// EMG data logging screen
 } ScreenState;
 
+// Tracks current screen state
 ScreenState current_state = STATE_SCREEN_A;
 
-// Blink flag (set in Timer1 interrupt)
-volatile uint8_t blink_flag = 0;
+
 
 
 /******************************************************* PWM *************************************************************/
@@ -58,7 +59,7 @@ volatile uint8_t blink_flag = 0;
 void pwm_init(void) {
 	DDRH |= (1 << PH5); // PH5 as output (OC4C)
 	
-	TCCR4A = (1 << COM4C1) | (1 << WGM41);  // Non-inverting, Fast PWM (part 1)
+	TCCR4A = (1 << COM4C1) | (1 << WGM41);  // Non-inverting, Fast PWM
 	TCCR4B = (1 << WGM43) | (1 << WGM42)    // Fast PWM mode 14, ICR4 = TOP
 	| (1 << CS41) | (1 << CS40);     // Prescaler = 64 (16MHz / 64 = 250 kHz)
 	
@@ -79,14 +80,14 @@ void adc_init(void) {
 	ADMUX = (1 << REFS0) | (1 << MUX2);				// AVcc as reference, ADC4 as input channel
 	ADCSRA = (1 << ADEN)							// Enable ADC
 	| (1 << ADIE)									// Enable ADC interrupt
-	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// Prescaler=128 => f_ADC = 125kHz
+	| (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);	// Prescaler=128 => f_ADC = 125kHz            ** 125kHz / 13 = 9.6kHz sampling **
 	sei();											// Enable global interrupts
 	ADCSRA |= (1 << ADSC);							// Start first conversion
 }
 
 // ISR triggers when ADC conversion complete
 ISR(ADC_vect) {
-	emg_samples[emg_index++] = ADC;	// Store ADC result in emg sample buffer, increment index
+	emg_samples[emg_index++] = ADC;	// Store ADC result in EMG sample buffer, increment index
 	if (emg_index >= BUFFER_SIZE) {	// If buffer is full:
 		emg_index = 0;					// Reset index
 		emg_buffer_full = 1;			// Set flag that buffer is full
@@ -115,27 +116,29 @@ ISR(TIMER1_COMPA_vect) {
 /************************************************ RMS Calculation ********************************************************/
 // Calculates the RMS value of samples i buffer
 uint16_t calculate_RMS(void) {
-	uint32_t sum = 0;
 	
-	// 1. Compute mean of all samples										
+	// 1. Compute mean of all samples
+	uint32_t sum = 0;
+											
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
 		sum += emg_samples[i];			// Sum all samples
 	}
 	uint16_t mean = sum / BUFFER_SIZE;	// Calculate the mean
 
+	
+	// 2. Calculate sum of squared deviations from mean    \sum{x_i - \mu}^2
 	uint32_t sum_squares = 0;
 	
-	// 2. Calculate sum of squared deviations from mean
 	for (uint16_t i = 0; i < BUFFER_SIZE; i++) {
-		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;	// Center sample around mean
+		int16_t centered = (int16_t)emg_samples[i] - (int16_t)mean;	// Center sample around mean because of DC bias --> Cast to int16_t for negative values (some might be below the mean => negative numbers!)
 		sum_squares += (uint32_t)centered * centered;				// Add square of sampled value
 	}
 	
-	// 3. Calculate mean of squared differences
+	// 3. Calculate mean of squared differences    1/N * \sum{x_i - \mu}^2
 	uint32_t mean_square = sum_squares / BUFFER_SIZE;
 	
 	// 4. Return the square root of the mean square	(RMS :))
-	return (uint16_t)sqrt((double)mean_square);
+	return (uint16_t)sqrt((double)mean_square);		// Cast to double for precision in sqrt operation --> final cast to uint16_t which is being returned
 }
 /*************************************************************************************************************************/
 
@@ -143,7 +146,7 @@ uint16_t calculate_RMS(void) {
 /************************************************ Motor Control **********************************************************/
 // 'Closes' the servo motor
 void closeHand(void) {
-	pwm_set_duty(6);
+	pwm_set_duty(6);	
 	_delay_ms(500);
 	pwm_set_duty(0);
 }
@@ -163,12 +166,12 @@ void openHand(void) {
 // Returns the first unused filename in 'filename_out'
 // If all names are taken, defaults to "EMG999.TXT"
 static void get_new_filename(char *filename_out) {
-	FILINFO fno;	// File info struct used by FatFs
+	FILINFO fno;	// File info struct used by FatFs to hold file metadata --> Used by f_stat
 	
 	for (uint16_t idx = 0; idx < 1000; idx++) {
 		sprintf(filename_out, "EMG%03u.TXT", idx);			// Format index into a filename: "EMG000.TXT", "EMG001.TXT", ..., "EMG999.TXT"
-		if (f_stat(filename_out, &fno) == FR_NO_FILE) {		// Check if file exists on SD card
-			return;											// If file does not exist, use that filename
+		if (f_stat(filename_out, &fno) == FR_NO_FILE) {		// Check if file does NOT exist on SD card and then returns TRUE
+			return;											// If file does not exist, stop loop and now filename_out contains the next file name
 		}
 	}
 
@@ -179,7 +182,7 @@ static void get_new_filename(char *filename_out) {
 // Logs a single RMS value (in millivolts) to the open SD file.
 // Must only be called after f_open(&file, ...) has succeeded.
 static void log_rms_to_sd(uint32_t rms_mv) {
-	char line[16];									// Buffer
+	char line[16];									// Buffer for holding text value of voltage
 	UINT bytes_written;								// Variable to store number of bytes actually written
 	uint8_t len = sprintf(line, "%lu\n", rms_mv);	// Format the RMS value followed by a newline, e.g., "1234\n"
 	f_write(&file, line, len, &bytes_written);		// Write the formatted string to the SD card file
@@ -287,7 +290,7 @@ int main(void) {
 	sei();							// Enable global timer interrupts
 	timer1_init();					// Start Timer1 for 1 Hz interrupts (for screenB)
 
-	current_state = STATE_SCREEN_A;	// Start in screen A (EMG visualisation)
+	current_state = STATE_SCREEN_A;	// Start in screen A (EMG visualization)
 	x = 319;						// Set initial X coordinate for plotting
 
 	InitCoordinate();				// Draw Screen A axes once at startup
@@ -309,12 +312,6 @@ int main(void) {
 			// Switch to Screen B (logging mode)
 			current_state = STATE_SCREEN_B;
 			
-			// Ensure ScreenB background is set on first call
-			{
-				extern void ScreenB(void);	// Inform compiler ScreenB exists
-				// Could reset any screen-specific state here if needed
-			}
-			
 			// Initialize Screen B background immediately to black
 			BackgroundColor(0, 0, 0);
 			break;
@@ -326,7 +323,7 @@ int main(void) {
 					while (1) { }
 				}
 
-				// Generate new filename like "EMG000.TXT" from helper function
+				// Generate new unique filename on SD-card
 				char fname[16];
 				get_new_filename(fname);
 
@@ -335,7 +332,8 @@ int main(void) {
 					// File open failed: halt
 					while (1) { }
 				}
-
+				
+				// Mounted the SD card file system and found unique file name, now ScreenB can run continuously.
 				// Run Screen B logic (logging + background blinking) until touch
 				while ( READ(D_IRQ_PINR, D_IRQ_PIN) ) {
 					ScreenB();
